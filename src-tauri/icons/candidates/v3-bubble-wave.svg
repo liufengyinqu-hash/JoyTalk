@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F0F9FF"/>
+    </linearGradient>
+    <linearGradient id="ac3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#0891B2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="240" fill="url(#bg3)"/>
+  <!-- Speech bubble -->
+  <path d="M 200 280 H 824 a 80 80 0 0 1 80 80 v 280 a 80 80 0 0 1 -80 80 H 540 l -120 110 v -110 H 200 a 80 80 0 0 1 -80 -80 V 360 a 80 80 0 0 1 80 -80 z"
+        fill="white" stroke="url(#ac3)" stroke-width="14"/>
+  <!-- Wave inside bubble -->
+  <g transform="translate(512, 500)">
+    <rect x="-260" y="-30" width="40" height="60" rx="20" fill="url(#ac3)" opacity="0.5"/>
+    <rect x="-180" y="-70" width="40" height="140" rx="20" fill="url(#ac3)" opacity="0.7"/>
+    <rect x="-100" y="-110" width="40" height="220" rx="20" fill="url(#ac3)" opacity="0.85"/>
+    <rect x="-20" y="-150" width="48" height="300" rx="24" fill="url(#ac3)"/>
+    <rect x="60" y="-100" width="40" height="200" rx="20" fill="url(#ac3)" opacity="0.85"/>
+    <rect x="140" y="-60" width="40" height="120" rx="20" fill="url(#ac3)" opacity="0.7"/>
+    <rect x="220" y="-30" width="40" height="60" rx="20" fill="url(#ac3)" opacity="0.5"/>
+  </g>
+</svg>

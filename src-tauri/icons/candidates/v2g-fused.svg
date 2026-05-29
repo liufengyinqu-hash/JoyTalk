@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg-e" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0F172A"/><stop offset="100%" stop-color="#020617"/></linearGradient>
+    <linearGradient id="ac-e" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#67E8F9"/><stop offset="100%" stop-color="#0E7490"/></linearGradient>
+    <filter id="g-e"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1024" height="1024" rx="240" fill="url(#bg-e)"/>
+
+  <!-- Main: large central D-pad as silhouette, EQ bars as scanline through it -->
+  <g transform="translate(512, 512)" filter="url(#g-e)">
+    <!-- Faint D-pad backdrop -->
+    <rect x="-160" y="-50" width="320" height="100" rx="50" fill="url(#ac-e)" opacity="0.18"/>
+    <rect x="-50" y="-160" width="100" height="320" rx="50" fill="url(#ac-e)" opacity="0.18"/>
+
+    <!-- Bright EQ bars overlaid -->
+    <rect x="-280" y="-50" width="32" height="100" rx="16" fill="url(#ac-e)" opacity="0.7"/>
+    <rect x="-210" y="-110" width="32" height="220" rx="16" fill="url(#ac-e)" opacity="0.85"/>
+    <rect x="-140" y="-180" width="40" height="360" rx="20" fill="url(#ac-e)"/>
+    <rect x="-60" y="-240" width="40" height="480" rx="20" fill="url(#ac-e)"/>
+    <rect x="20" y="-180" width="40" height="360" rx="20" fill="url(#ac-e)"/>
+    <rect x="100" y="-110" width="32" height="220" rx="16" fill="url(#ac-e)" opacity="0.85"/>
+    <rect x="170" y="-50" width="32" height="100" rx="16" fill="url(#ac-e)" opacity="0.7"/>
+  </g>
+</svg>

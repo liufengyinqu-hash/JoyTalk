@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg-c" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0F172A"/><stop offset="100%" stop-color="#020617"/></linearGradient>
+    <linearGradient id="ac-c" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#67E8F9"/><stop offset="100%" stop-color="#0E7490"/></linearGradient>
+    <filter id="g-c"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1024" height="1024" rx="240" fill="url(#bg-c)"/>
+  <ellipse cx="512" cy="512" rx="420" ry="180" fill="#22D3EE" opacity="0.15"/>
+
+  <!-- Two Joy-Con bodies as side rails -->
+  <rect x="80" y="280" width="80" height="464" rx="40" fill="url(#ac-c)" opacity="0.22"/>
+  <rect x="864" y="280" width="80" height="464" rx="40" fill="url(#ac-c)" opacity="0.22"/>
+  <!-- L stick on left -->
+  <circle cx="120" cy="420" r="22" fill="url(#ac-c)" opacity="0.85" filter="url(#g-c)"/>
+  <!-- D-pad on left -->
+  <g transform="translate(120, 600)" opacity="0.9">
+    <rect x="-30" y="-8" width="60" height="16" rx="8" fill="#22D3EE"/>
+    <rect x="-8" y="-30" width="16" height="60" rx="8" fill="#22D3EE"/>
+  </g>
+  <!-- R stick on right -->
+  <circle cx="904" cy="600" r="22" fill="url(#ac-c)" opacity="0.85" filter="url(#g-c)"/>
+  <!-- ABXY on right -->
+  <g transform="translate(904, 420)" opacity="0.9">
+    <circle cx="0" cy="-26" r="10" fill="#22D3EE"/>
+    <circle cx="-26" cy="0" r="10" fill="#22D3EE"/>
+    <circle cx="26" cy="0" r="10" fill="#22D3EE"/>
+    <circle cx="0" cy="26" r="10" fill="#22D3EE"/>
+  </g>
+
+  <!-- Center: EQ bars (compressed, fits between rails) -->
+  <g transform="translate(512, 512)" filter="url(#g-c)">
+    <rect x="-260" y="-50" width="34" height="100" rx="17" fill="url(#ac-c)" opacity="0.55"/>
+    <rect x="-190" y="-110" width="34" height="220" rx="17" fill="url(#ac-c)" opacity="0.72"/>
+    <rect x="-120" y="-180" width="40" height="360" rx="20" fill="url(#ac-c)" opacity="0.88"/>
+    <rect x="-44" y="-230" width="40" height="460" rx="20" fill="url(#ac-c)"/>
+    <rect x="32" y="-170" width="40" height="340" rx="20" fill="url(#ac-c)" opacity="0.9"/>
+    <rect x="108" y="-100" width="34" height="200" rx="17" fill="url(#ac-c)" opacity="0.7"/>
+    <rect x="178" y="-50" width="34" height="100" rx="17" fill="url(#ac-c)" opacity="0.5"/>
+  </g>
+</svg>

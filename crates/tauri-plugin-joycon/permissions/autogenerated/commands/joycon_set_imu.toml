@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-set-imu"
+description = "Enables the joycon_set_imu command without any pre-configured scope."
+commands.allow = ["joycon_set_imu"]
+
+[[permission]]
+identifier = "deny-joycon-set-imu"
+description = "Denies the joycon_set_imu command without any pre-configured scope."
+commands.deny = ["joycon_set_imu"]

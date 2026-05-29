@@ -8,6 +8,7 @@ import {
   checkMicrophonePermission,
 } from "tauri-plugin-macos-permissions-api";
 import { ModelStateEvent, RecordingErrorEvent } from "./lib/types/events";
+import type { JoyConStatus } from "./components/plugins/joycon/types";
 import "./App.css";
 import AccessibilityPermissions from "./components/AccessibilityPermissions";
 import Footer from "./components/footer";
@@ -123,7 +124,7 @@ function App() {
   }, [t]);
 
   // Listen for paste failures and show a toast.
-  // The technical error detail is logged to handy.log on the Rust side
+  // The technical error detail is logged to joytalk.log on the Rust side
   // (see actions.rs `error!("Failed to paste transcription: ...")`),
   // so we show a localized, user-friendly message here instead of the raw error.
   useEffect(() => {
@@ -136,6 +137,79 @@ function App() {
       unlisten.then((fn) => fn());
     };
   }, [t]);
+
+  // Listen for Joy-Con controller detection: first-pair → guide user to Plugins page.
+  useEffect(() => {
+    const unlisten = listen<{
+      kind: string;
+      serial: string;
+      device_index: number;
+      is_first_pair: boolean;
+    }>("joycon://controller_detected", (event) => {
+      const { kind, is_first_pair } = event.payload;
+      if (!is_first_pair) return;
+      const niceName =
+        kind === "joy_con_left"
+          ? "Joy-Con (L)"
+          : kind === "joy_con_right"
+            ? "Joy-Con (R)"
+            : kind === "pro_controller"
+              ? "Pro Controller"
+              : "Controller";
+      toast.success(`${niceName} detected`, {
+        description: "Open Plugins → Joy-Con to configure mappings",
+        duration: 8000,
+        action: {
+          label: "Configure",
+          onClick: () => setCurrentSection("plugins" as SidebarSection),
+        },
+      });
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, []);
+
+  // Reconnect toast: only after a prior disconnect, debounced (not every retry).
+  useEffect(() => {
+    let wasConnected = false;
+    let hadConnectedBefore = false;
+    let lastToastAt = 0;
+    const unlisten = listen<JoyConStatus>("joycon://status", (event) => {
+      const st = event.payload;
+      const now = Date.now();
+      if (
+        st.connected &&
+        !wasConnected &&
+        hadConnectedBefore &&
+        now - lastToastAt > 10_000
+      ) {
+        const names =
+          st.connected_controllers
+            ?.map((c) =>
+              c.kind === "joy_con_left"
+                ? "Joy-Con (L)"
+                : c.kind === "joy_con_right"
+                  ? "Joy-Con (R)"
+                  : c.kind === "pro_controller"
+                    ? "Pro Controller"
+                    : "Controller",
+            )
+            .join(" + ") ?? "";
+        if (names) {
+          lastToastAt = now;
+          toast(`${names} connected`, { duration: 3000 });
+        }
+      }
+      if (st.connected) {
+        hadConnectedBefore = true;
+      }
+      wasConnected = st.connected;
+    });
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, []);
 
   // Listen for model loading failures and show a toast
   useEffect(() => {

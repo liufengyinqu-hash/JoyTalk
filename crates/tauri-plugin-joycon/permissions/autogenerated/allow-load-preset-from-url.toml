@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-load-preset-from-url"
+description = "Allow joycon_load_preset_from_url command"
+commands.allow = ["joycon_load_preset_from_url"]

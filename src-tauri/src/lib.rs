@@ -96,11 +96,7 @@ fn show_main_window(app: &AppHandle) {
             log::error!("Failed to focus webview window: {}", e);
         }
         #[cfg(target_os = "macos")]
-        {
-            if let Err(e) = app.set_activation_policy(tauri::ActivationPolicy::Regular) {
-                log::error!("Failed to set activation policy to Regular: {}", e);
-            }
-        }
+        ensure_macos_dock_visible(app);
         return;
     }
 
@@ -136,6 +132,19 @@ fn should_force_show_permissions_window(app: &AppHandle) -> bool {
 
     false
 }
+
+#[cfg(target_os = "macos")]
+fn ensure_macos_dock_visible(app: &AppHandle) {
+    if let Err(e) = app.set_activation_policy(tauri::ActivationPolicy::Regular) {
+        log::error!("Failed to set activation policy to Regular: {}", e);
+    }
+    if let Err(e) = app.set_dock_visibility(true) {
+        log::error!("Failed to set dock visibility: {}", e);
+    }
+}
+
+#[cfg(not(target_os = "macos"))]
+fn ensure_macos_dock_visible(_app: &AppHandle) {}
 
 fn initialize_core_logic(app_handle: &AppHandle) {
     // Note: Enigo (keyboard/mouse simulation) is NOT initialized here.
@@ -176,15 +185,10 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     #[cfg(unix)]
     signal_handle::setup_signal_handler(app_handle.clone(), signals);
 
-    // Apply macOS Accessory policy if starting hidden and tray is available.
-    // If the tray icon is disabled, keep the dock icon so the user can reopen.
-    #[cfg(target_os = "macos")]
-    {
-        let settings = settings::get_settings(app_handle);
-        if settings.start_hidden && settings.show_tray_icon {
-            let _ = app_handle.set_activation_policy(tauri::ActivationPolicy::Accessory);
-        }
-    }
+    // Always keep dock + tray visible on macOS (B option).
+    // Previously this would switch to Accessory policy when start_hidden + show_tray_icon
+    // were both true, which hid the dock icon. Users expected dock + tray to coexist.
+    ensure_macos_dock_visible(app_handle);
     // Get the current theme to set the appropriate initial icon
     let initial_theme = tray::get_current_theme(app_handle);
 
@@ -459,11 +463,11 @@ pub fn run(cli_args: CliArgs) {
                     Target::new(if let Some(data_dir) = portable::data_dir() {
                         TargetKind::Folder {
                             path: data_dir.join("logs"),
-                            file_name: Some("handy".into()),
+                            file_name: Some("joytalk".into()),
                         }
                     } else {
                         TargetKind::LogDir {
-                            file_name: Some("handy".into()),
+                            file_name: Some("joytalk".into()),
                         }
                     })
                     .filter(|metadata| {
@@ -500,23 +504,93 @@ pub fn run(cli_args: CliArgs) {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(
+            tauri_plugin_joycon::Builder::new()
+                .action("transcribe", |ctx| {
+                    crate::shortcut::handler::handle_shortcut_event(
+                        &ctx.app,
+                        "transcribe",
+                        "joycon",
+                        ctx.pressed,
+                    );
+                })
+                .action("start_transcribe", |ctx| {
+                    if !ctx.pressed {
+                        return;
+                    }
+                    let audio = ctx
+                        .app
+                        .state::<std::sync::Arc<crate::managers::audio::AudioRecordingManager>>();
+                    if audio.is_recording() {
+                        return;
+                    }
+                    if let Some(coord) = ctx
+                        .app
+                        .try_state::<crate::TranscriptionCoordinator>()
+                    {
+                        // push_to_talk=false → toggle path; since not recording, this starts.
+                        coord.send_input("transcribe", "joycon", true, false);
+                    }
+                })
+                .action("stop_transcribe", |ctx| {
+                    if !ctx.pressed {
+                        return;
+                    }
+                    let audio = ctx
+                        .app
+                        .state::<std::sync::Arc<crate::managers::audio::AudioRecordingManager>>();
+                    if !audio.is_recording() {
+                        return;
+                    }
+                    if let Some(coord) = ctx
+                        .app
+                        .try_state::<crate::TranscriptionCoordinator>()
+                    {
+                        coord.send_input("transcribe", "joycon", true, false);
+                    }
+                })
+                .action("cancel", |ctx| {
+                    if ctx.pressed {
+                        crate::utils::cancel_current_operation(&ctx.app);
+                    }
+                })
+                .action("transcribe_or_cancel", |ctx| {
+                    if !ctx.pressed {
+                        return;
+                    }
+                    let audio = ctx
+                        .app
+                        .state::<std::sync::Arc<crate::managers::audio::AudioRecordingManager>>();
+                    if audio.is_recording() {
+                        crate::utils::cancel_current_operation(&ctx.app);
+                    } else if let Some(coord) = ctx
+                        .app
+                        .try_state::<crate::TranscriptionCoordinator>()
+                    {
+                        coord.send_input("transcribe", "joycon", true, false);
+                    }
+                })
+                .build(),
+        )
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             Some(vec![]),
         ))
         .manage(cli_args.clone())
         .setup(move |app| {
+            ensure_macos_dock_visible(&app.handle());
             specta_builder.mount_events(app);
 
             // Create main window programmatically so we can set data_directory
             // for portable mode (redirects WebView2 cache to portable Data dir)
             let mut win_builder =
                 tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
-                    .title("Handy")
+                    .title("JoyTalk")
                     .inner_size(680.0, 570.0)
                     .min_inner_size(680.0, 570.0)
                     .resizable(true)
-                    .maximizable(false)
+                    .maximizable(true)
+                    .decorations(true)
                     .visible(false);
 
             if let Some(data_dir) = portable::data_dir() {
@@ -569,31 +643,18 @@ pub fn run(cli_args: CliArgs) {
             let tray_available = settings.show_tray_icon && !cli_args.no_tray;
             if should_force_show || !should_hide || !tray_available {
                 show_main_window(&app_handle);
+            } else {
+                // start_hidden: keep dock icon even when the main window stays hidden.
+                ensure_macos_dock_visible(&app_handle);
             }
 
             Ok(())
         })
         .on_window_event(|window, event| match event {
-            tauri::WindowEvent::CloseRequested { api, .. } => {
-                api.prevent_close();
-                let _res = window.hide();
-
-                #[cfg(target_os = "macos")]
-                {
-                    let settings = get_settings(&window.app_handle());
-                    let tray_visible =
-                        settings.show_tray_icon && !window.app_handle().state::<CliArgs>().no_tray;
-                    if tray_visible {
-                        // Tray is available: hide the dock icon, app lives in the tray
-                        let res = window
-                            .app_handle()
-                            .set_activation_policy(tauri::ActivationPolicy::Accessory);
-                        if let Err(e) = res {
-                            log::error!("Failed to set activation policy: {}", e);
-                        }
-                    }
-                    // No tray: keep the dock icon visible so the user can reopen
-                }
+            tauri::WindowEvent::CloseRequested { .. } => {
+                // Quit app on window close (Cmd+Q / red traffic-light).
+                // Dock icon disappears with the process; tray will also exit.
+                window.app_handle().exit(0);
             }
             tauri::WindowEvent::ThemeChanged(theme) => {
                 log::info!("Theme changed to: {:?}", theme);

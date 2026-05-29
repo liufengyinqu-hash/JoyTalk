@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-profiles"
+description = "Allow joycon_get_profiles command"
+commands.allow = ["joycon_get_profiles"]

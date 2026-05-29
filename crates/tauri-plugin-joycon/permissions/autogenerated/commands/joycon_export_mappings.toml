@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-export-mappings"
+description = "Enables the joycon_export_mappings command without any pre-configured scope."
+commands.allow = ["joycon_export_mappings"]
+
+[[permission]]
+identifier = "deny-joycon-export-mappings"
+description = "Denies the joycon_export_mappings command without any pre-configured scope."
+commands.deny = ["joycon_export_mappings"]

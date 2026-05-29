@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-list-actions"
+description = "Allow joycon_list_actions command"
+commands.allow = ["joycon_list_actions"]

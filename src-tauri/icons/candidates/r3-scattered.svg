@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg-r3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0F172A"/><stop offset="100%" stop-color="#020617"/></linearGradient>
+    <linearGradient id="ac-r3" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#67E8F9"/><stop offset="100%" stop-color="#0E7490"/></linearGradient>
+    <filter id="g-r3"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1024" height="1024" rx="240" fill="url(#bg-r3)"/>
+
+  <!-- TL: minus pill -->
+  <g transform="translate(220, 200) rotate(-10)" filter="url(#g-r3)">
+    <rect x="-26" y="-7" width="52" height="14" rx="7" fill="url(#ac-r3)" opacity="0.8"/>
+  </g>
+  <!-- TL: X -->
+  <g transform="translate(310, 280)" filter="url(#g-r3)">
+    <circle cx="0" cy="0" r="26" fill="url(#ac-r3)" opacity="0.78"/>
+    <text x="0" y="8" text-anchor="middle" font-size="24" font-weight="700" fill="#0F172A" font-family="-apple-system, sans-serif">X</text>
+  </g>
+
+  <!-- TR: A -->
+  <g transform="translate(820, 200)" filter="url(#g-r3)">
+    <circle cx="0" cy="0" r="32" fill="url(#ac-r3)" opacity="0.88"/>
+    <text x="0" y="10" text-anchor="middle" font-size="30" font-weight="700" fill="#0F172A" font-family="-apple-system, sans-serif">A</text>
+  </g>
+  <!-- TR: stick R -->
+  <g transform="translate(720, 300)" filter="url(#g-r3)">
+    <circle cx="0" cy="0" r="36" fill="none" stroke="url(#ac-r3)" stroke-width="5" opacity="0.7"/>
+    <circle cx="0" cy="0" r="18" fill="url(#ac-r3)" opacity="0.9"/>
+  </g>
+
+  <!-- BL: stick L -->
+  <g transform="translate(220, 800)" filter="url(#g-r3)">
+    <circle cx="0" cy="0" r="36" fill="none" stroke="url(#ac-r3)" stroke-width="5" opacity="0.7"/>
+    <circle cx="0" cy="0" r="18" fill="url(#ac-r3)" opacity="0.9"/>
+  </g>
+  <!-- BL: plus -->
+  <g transform="translate(330, 730) rotate(15)" filter="url(#g-r3)">
+    <rect x="-22" y="-6" width="44" height="12" rx="6" fill="url(#ac-r3)" opacity="0.75"/>
+    <rect x="-6" y="-22" width="12" height="44" rx="6" fill="url(#ac-r3)" opacity="0.75"/>
+  </g>
+
+  <!-- BR: B -->
+  <g transform="translate(820, 820)" filter="url(#g-r3)">
+    <circle cx="0" cy="0" r="32" fill="url(#ac-r3)" opacity="0.85"/>
+    <text x="0" y="10" text-anchor="middle" font-size="30" font-weight="700" fill="#0F172A" font-family="-apple-system, sans-serif">B</text>
+  </g>
+  <!-- BR: Y -->
+  <g transform="translate(720, 740)" filter="url(#g-r3)">
+    <circle cx="0" cy="0" r="22" fill="url(#ac-r3)" opacity="0.7"/>
+    <text x="0" y="7" text-anchor="middle" font-size="20" font-weight="700" fill="#0F172A" font-family="-apple-system, sans-serif">Y</text>
+  </g>
+
+  <!-- Center: EQ -->
+  <g transform="translate(512, 540)" filter="url(#g-r3)">
+    <rect x="-300" y="-50" width="40" height="100" rx="20" fill="url(#ac-r3)" opacity="0.55"/>
+    <rect x="-220" y="-120" width="40" height="240" rx="20" fill="url(#ac-r3)" opacity="0.72"/>
+    <rect x="-140" y="-200" width="48" height="400" rx="24" fill="url(#ac-r3)"/>
+    <rect x="-52" y="-260" width="48" height="520" rx="24" fill="url(#ac-r3)"/>
+    <rect x="36" y="-170" width="48" height="340" rx="24" fill="url(#ac-r3)" opacity="0.92"/>
+    <rect x="124" y="-100" width="40" height="200" rx="20" fill="url(#ac-r3)" opacity="0.75"/>
+    <rect x="204" y="-60" width="40" height="120" rx="20" fill="url(#ac-r3)" opacity="0.55"/>
+  </g>
+</svg>

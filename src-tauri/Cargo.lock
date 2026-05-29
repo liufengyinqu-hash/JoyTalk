@@ -2412,67 +2412,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "handy"
-version = "0.8.3"
-dependencies = [
- "anyhow",
- "chrono",
- "clap",
- "cpal",
- "enigo",
- "env_filter",
- "ferrous-opencc",
- "flate2",
- "futures-util",
- "gtk",
- "gtk-layer-shell",
- "handy-keys",
- "hound",
- "log",
- "natural",
- "once_cell",
- "rdev 0.5.0-2",
- "regex",
- "reqwest 0.12.28",
- "rodio",
- "rubato",
- "rusqlite",
- "rusqlite_migration",
- "rustfft",
- "serde",
- "serde_json",
- "sha2",
- "signal-hook",
- "specta",
- "specta-typescript",
- "strsim",
- "tar",
- "tauri",
- "tauri-build",
- "tauri-nspanel",
- "tauri-plugin-autostart",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-log",
- "tauri-plugin-macos-permissions",
- "tauri-plugin-opener",
- "tauri-plugin-os",
- "tauri-plugin-process",
- "tauri-plugin-single-instance",
- "tauri-plugin-store",
- "tauri-plugin-updater",
- "tauri-specta",
- "tempfile",
- "tokio",
- "transcribe-rs",
- "vad-rs",
- "windows 0.61.3",
- "winreg 0.55.0",
-]
-
-[[package]]
 name = "handy-keys"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2547,6 +2486,18 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+
+[[package]]
+name = "hidapi"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "798154e4b6570af74899d71155fb0072d5b17e6aa12f39c8ef22c60fb8ec99e7"
+dependencies = [
+ "cc",
+ "libc",
+ "pkg-config",
+ "winapi",
+]
 
 [[package]]
 name = "hmac-sha256"
@@ -3044,6 +2995,79 @@ name = "jni-sys"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
+
+[[package]]
+name = "joycon-rs"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a909e093eeb8158f53bb7f34c8d1ccd17af33fe79ddfd6d24c88b166b8ef3221"
+dependencies = [
+ "crossbeam-channel",
+ "hidapi",
+ "lazy_static",
+]
+
+[[package]]
+name = "joytalk"
+version = "0.8.3"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap",
+ "cpal",
+ "enigo",
+ "env_filter",
+ "ferrous-opencc",
+ "flate2",
+ "futures-util",
+ "gtk",
+ "gtk-layer-shell",
+ "handy-keys",
+ "hound",
+ "joycon-rs",
+ "log",
+ "natural",
+ "once_cell",
+ "rdev 0.5.0-2",
+ "regex",
+ "reqwest 0.12.28",
+ "rodio",
+ "rubato",
+ "rusqlite",
+ "rusqlite_migration",
+ "rustfft",
+ "serde",
+ "serde_json",
+ "sha2",
+ "signal-hook",
+ "specta",
+ "specta-typescript",
+ "strsim",
+ "tar",
+ "tauri",
+ "tauri-build",
+ "tauri-nspanel",
+ "tauri-plugin-autostart",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-log",
+ "tauri-plugin-macos-permissions",
+ "tauri-plugin-opener",
+ "tauri-plugin-os",
+ "tauri-plugin-process",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-store",
+ "tauri-plugin-updater",
+ "tauri-specta",
+ "tempfile",
+ "tokio",
+ "transcribe-rs",
+ "vad-rs",
+ "windows 0.61.3",
+ "winreg 0.55.0",
+]
 
 [[package]]
 name = "js-sys"

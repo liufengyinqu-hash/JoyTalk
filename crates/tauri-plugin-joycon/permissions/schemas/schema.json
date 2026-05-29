@@ -1,0 +1,756 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PermissionFile",
+  "description": "Permission file that can define a default permission, a set of permissions or a list of inlined permissions.",
+  "type": "object",
+  "properties": {
+    "default": {
+      "description": "The default permission set for the plugin",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DefaultPermission"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "set": {
+      "description": "A list of permissions sets defined",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PermissionSet"
+      }
+    },
+    "permission": {
+      "description": "A list of inlined permissions",
+      "default": [],
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Permission"
+      }
+    }
+  },
+  "definitions": {
+    "DefaultPermission": {
+      "description": "The default permission set of the plugin.\n\nWorks similarly to a permission with the \"default\" identifier.",
+      "type": "object",
+      "required": [
+        "permissions"
+      ],
+      "properties": {
+        "version": {
+          "description": "The version of the permission.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 1.0
+        },
+        "description": {
+          "description": "Human-readable description of what the permission does. Tauri convention is to use `<h4>` headings in markdown content for Tauri documentation generation purposes.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "permissions": {
+          "description": "All permissions this set contains.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "PermissionSet": {
+      "description": "A set of direct permissions grouped together under a new name.",
+      "type": "object",
+      "required": [
+        "description",
+        "identifier",
+        "permissions"
+      ],
+      "properties": {
+        "identifier": {
+          "description": "A unique identifier for the permission.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Human-readable description of what the permission does.",
+          "type": "string"
+        },
+        "permissions": {
+          "description": "All permissions this set contains.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PermissionKind"
+          }
+        }
+      }
+    },
+    "Permission": {
+      "description": "Descriptions of explicit privileges of commands.\n\nIt can enable commands to be accessible in the frontend of the application.\n\nIf the scope is defined it can be used to fine grain control the access of individual or multiple commands.",
+      "type": "object",
+      "required": [
+        "identifier"
+      ],
+      "properties": {
+        "version": {
+          "description": "The version of the permission.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 1.0
+        },
+        "identifier": {
+          "description": "A unique identifier for the permission.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Human-readable description of what the permission does. Tauri internal convention is to use `<h4>` headings in markdown content for Tauri documentation generation purposes.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "commands": {
+          "description": "Allowed or denied commands when using this permission.",
+          "default": {
+            "allow": [],
+            "deny": []
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/Commands"
+            }
+          ]
+        },
+        "scope": {
+          "description": "Allowed or denied scoped when using this permission.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Scopes"
+            }
+          ]
+        },
+        "platforms": {
+          "description": "Target platforms this permission applies. By default all platforms are affected by this permission.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/Target"
+          }
+        }
+      }
+    },
+    "Commands": {
+      "description": "Allowed and denied commands inside a permission.\n\nIf two commands clash inside of `allow` and `deny`, it should be denied by default.",
+      "type": "object",
+      "properties": {
+        "allow": {
+          "description": "Allowed command.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deny": {
+          "description": "Denied command, which takes priority.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Scopes": {
+      "description": "An argument for fine grained behavior control of Tauri commands.\n\nIt can be of any serde serializable type and is used to allow or prevent certain actions inside a Tauri command. The configured scope is passed to the command and will be enforced by the command implementation.\n\n## Example\n\n```json { \"allow\": [{ \"path\": \"$HOME/**\" }], \"deny\": [{ \"path\": \"$HOME/secret.txt\" }] } ```",
+      "type": "object",
+      "properties": {
+        "allow": {
+          "description": "Data that defines what is allowed by the scope.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        "deny": {
+          "description": "Data that defines what is denied by the scope. This should be prioritized by validation logic.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        }
+      }
+    },
+    "Value": {
+      "description": "All supported ACL values.",
+      "anyOf": [
+        {
+          "description": "Represents a null JSON value.",
+          "type": "null"
+        },
+        {
+          "description": "Represents a [`bool`].",
+          "type": "boolean"
+        },
+        {
+          "description": "Represents a valid ACL [`Number`].",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Number"
+            }
+          ]
+        },
+        {
+          "description": "Represents a [`String`].",
+          "type": "string"
+        },
+        {
+          "description": "Represents a list of other [`Value`]s.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        {
+          "description": "Represents a map of [`String`] keys to [`Value`]s.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Value"
+          }
+        }
+      ]
+    },
+    "Number": {
+      "description": "A valid ACL number.",
+      "anyOf": [
+        {
+          "description": "Represents an [`i64`].",
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "description": "Represents a [`f64`].",
+          "type": "number",
+          "format": "double"
+        }
+      ]
+    },
+    "Target": {
+      "description": "Platform target.",
+      "oneOf": [
+        {
+          "description": "MacOS.",
+          "type": "string",
+          "enum": [
+            "macOS"
+          ]
+        },
+        {
+          "description": "Windows.",
+          "type": "string",
+          "enum": [
+            "windows"
+          ]
+        },
+        {
+          "description": "Linux.",
+          "type": "string",
+          "enum": [
+            "linux"
+          ]
+        },
+        {
+          "description": "Android.",
+          "type": "string",
+          "enum": [
+            "android"
+          ]
+        },
+        {
+          "description": "iOS.",
+          "type": "string",
+          "enum": [
+            "iOS"
+          ]
+        }
+      ]
+    },
+    "PermissionKind": {
+      "type": "string",
+      "oneOf": [
+        {
+          "description": "Allow joycon_delete_profile command",
+          "type": "string",
+          "const": "allow-delete-profile",
+          "markdownDescription": "Allow joycon_delete_profile command"
+        },
+        {
+          "description": "Allow joycon_export_mappings command",
+          "type": "string",
+          "const": "allow-export-mappings",
+          "markdownDescription": "Allow joycon_export_mappings command"
+        },
+        {
+          "description": "Allow joycon_get_enabled command",
+          "type": "string",
+          "const": "allow-get-enabled",
+          "markdownDescription": "Allow joycon_get_enabled command"
+        },
+        {
+          "description": "Allow joycon_get_frontmost_app command",
+          "type": "string",
+          "const": "allow-get-frontmost-app",
+          "markdownDescription": "Allow joycon_get_frontmost_app command"
+        },
+        {
+          "description": "Allow joycon_get_frontmost command",
+          "type": "string",
+          "const": "allow-get-frontmost",
+          "markdownDescription": "Allow joycon_get_frontmost command"
+        },
+        {
+          "description": "Allow joycon_get_imu command",
+          "type": "string",
+          "const": "allow-get-imu",
+          "markdownDescription": "Allow joycon_get_imu command"
+        },
+        {
+          "description": "Allow joycon_get_mappings command",
+          "type": "string",
+          "const": "allow-get-mappings",
+          "markdownDescription": "Allow joycon_get_mappings command"
+        },
+        {
+          "description": "Allow joycon_get_per_app_enabled command",
+          "type": "string",
+          "const": "allow-get-per-app-enabled",
+          "markdownDescription": "Allow joycon_get_per_app_enabled command"
+        },
+        {
+          "description": "Allow joycon_get_preset_mappings command",
+          "type": "string",
+          "const": "allow-get-preset-mappings",
+          "markdownDescription": "Allow joycon_get_preset_mappings command"
+        },
+        {
+          "description": "Allow joycon_get_profiles command",
+          "type": "string",
+          "const": "allow-get-profiles",
+          "markdownDescription": "Allow joycon_get_profiles command"
+        },
+        {
+          "description": "Allow joycon_get_status command",
+          "type": "string",
+          "const": "allow-get-status",
+          "markdownDescription": "Allow joycon_get_status command"
+        },
+        {
+          "description": "Allow joycon_import_mappings command",
+          "type": "string",
+          "const": "allow-import-mappings",
+          "markdownDescription": "Allow joycon_import_mappings command"
+        },
+        {
+          "description": "Allow joycon_list_actions command",
+          "type": "string",
+          "const": "allow-list-actions",
+          "markdownDescription": "Allow joycon_list_actions command"
+        },
+        {
+          "description": "Allow joycon_list_apps command",
+          "type": "string",
+          "const": "allow-list-apps",
+          "markdownDescription": "Allow joycon_list_apps command"
+        },
+        {
+          "description": "Allow joycon_list_presets command",
+          "type": "string",
+          "const": "allow-list-presets",
+          "markdownDescription": "Allow joycon_list_presets command"
+        },
+        {
+          "description": "Allow joycon_load_preset_from_url command",
+          "type": "string",
+          "const": "allow-load-preset-from-url",
+          "markdownDescription": "Allow joycon_load_preset_from_url command"
+        },
+        {
+          "description": "Allow joycon_load_preset command",
+          "type": "string",
+          "const": "allow-load-preset",
+          "markdownDescription": "Allow joycon_load_preset command"
+        },
+        {
+          "description": "Allow joycon_reset_mappings command",
+          "type": "string",
+          "const": "allow-reset-mappings",
+          "markdownDescription": "Allow joycon_reset_mappings command"
+        },
+        {
+          "description": "Allow joycon_save_profile command",
+          "type": "string",
+          "const": "allow-save-profile",
+          "markdownDescription": "Allow joycon_save_profile command"
+        },
+        {
+          "description": "Allow joycon_set_enabled command",
+          "type": "string",
+          "const": "allow-set-enabled",
+          "markdownDescription": "Allow joycon_set_enabled command"
+        },
+        {
+          "description": "Allow joycon_set_imu command",
+          "type": "string",
+          "const": "allow-set-imu",
+          "markdownDescription": "Allow joycon_set_imu command"
+        },
+        {
+          "description": "Allow joycon_set_mapping command",
+          "type": "string",
+          "const": "allow-set-mapping",
+          "markdownDescription": "Allow joycon_set_mapping command"
+        },
+        {
+          "description": "Allow joycon_set_per_app_enabled command",
+          "type": "string",
+          "const": "allow-set-per-app-enabled",
+          "markdownDescription": "Allow joycon_set_per_app_enabled command"
+        },
+        {
+          "description": "Allow joycon_start_capture command",
+          "type": "string",
+          "const": "allow-start-capture",
+          "markdownDescription": "Allow joycon_start_capture command"
+        },
+        {
+          "description": "Allow joycon_stop_capture command",
+          "type": "string",
+          "const": "allow-stop-capture",
+          "markdownDescription": "Allow joycon_stop_capture command"
+        },
+        {
+          "description": "Enables the joycon_delete_profile command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-delete-profile",
+          "markdownDescription": "Enables the joycon_delete_profile command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_delete_profile command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-delete-profile",
+          "markdownDescription": "Denies the joycon_delete_profile command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_export_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-export-mappings",
+          "markdownDescription": "Enables the joycon_export_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_export_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-export-mappings",
+          "markdownDescription": "Denies the joycon_export_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-enabled",
+          "markdownDescription": "Enables the joycon_get_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-enabled",
+          "markdownDescription": "Denies the joycon_get_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_frontmost command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-frontmost",
+          "markdownDescription": "Enables the joycon_get_frontmost command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_frontmost command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-frontmost",
+          "markdownDescription": "Denies the joycon_get_frontmost command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_frontmost_app command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-frontmost-app",
+          "markdownDescription": "Enables the joycon_get_frontmost_app command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_frontmost_app command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-frontmost-app",
+          "markdownDescription": "Denies the joycon_get_frontmost_app command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_imu command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-imu",
+          "markdownDescription": "Enables the joycon_get_imu command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_imu command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-imu",
+          "markdownDescription": "Denies the joycon_get_imu command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-mappings",
+          "markdownDescription": "Enables the joycon_get_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-mappings",
+          "markdownDescription": "Denies the joycon_get_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_per_app_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-per-app-enabled",
+          "markdownDescription": "Enables the joycon_get_per_app_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_per_app_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-per-app-enabled",
+          "markdownDescription": "Denies the joycon_get_per_app_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_preset_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-preset-mappings",
+          "markdownDescription": "Enables the joycon_get_preset_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_preset_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-preset-mappings",
+          "markdownDescription": "Denies the joycon_get_preset_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_profiles command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-profiles",
+          "markdownDescription": "Enables the joycon_get_profiles command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_profiles command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-profiles",
+          "markdownDescription": "Denies the joycon_get_profiles command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_status command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-status",
+          "markdownDescription": "Enables the joycon_get_status command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_status command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-status",
+          "markdownDescription": "Denies the joycon_get_status command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_import_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-import-mappings",
+          "markdownDescription": "Enables the joycon_import_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_import_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-import-mappings",
+          "markdownDescription": "Denies the joycon_import_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_list_actions command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-list-actions",
+          "markdownDescription": "Enables the joycon_list_actions command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_list_actions command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-list-actions",
+          "markdownDescription": "Denies the joycon_list_actions command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_list_apps command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-list-apps",
+          "markdownDescription": "Enables the joycon_list_apps command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_list_apps command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-list-apps",
+          "markdownDescription": "Denies the joycon_list_apps command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_list_presets command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-list-presets",
+          "markdownDescription": "Enables the joycon_list_presets command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_list_presets command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-list-presets",
+          "markdownDescription": "Denies the joycon_list_presets command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_load_preset command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-load-preset",
+          "markdownDescription": "Enables the joycon_load_preset command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_load_preset command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-load-preset",
+          "markdownDescription": "Denies the joycon_load_preset command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_load_preset_from_url command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-load-preset-from-url",
+          "markdownDescription": "Enables the joycon_load_preset_from_url command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_load_preset_from_url command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-load-preset-from-url",
+          "markdownDescription": "Denies the joycon_load_preset_from_url command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_reset_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-reset-mappings",
+          "markdownDescription": "Enables the joycon_reset_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_reset_mappings command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-reset-mappings",
+          "markdownDescription": "Denies the joycon_reset_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_save_profile command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-save-profile",
+          "markdownDescription": "Enables the joycon_save_profile command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_save_profile command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-save-profile",
+          "markdownDescription": "Denies the joycon_save_profile command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_set_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-set-enabled",
+          "markdownDescription": "Enables the joycon_set_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_set_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-set-enabled",
+          "markdownDescription": "Denies the joycon_set_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_set_imu command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-set-imu",
+          "markdownDescription": "Enables the joycon_set_imu command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_set_imu command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-set-imu",
+          "markdownDescription": "Denies the joycon_set_imu command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_set_mapping command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-set-mapping",
+          "markdownDescription": "Enables the joycon_set_mapping command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_set_mapping command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-set-mapping",
+          "markdownDescription": "Denies the joycon_set_mapping command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_set_per_app_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-set-per-app-enabled",
+          "markdownDescription": "Enables the joycon_set_per_app_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_set_per_app_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-set-per-app-enabled",
+          "markdownDescription": "Denies the joycon_set_per_app_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_start_capture command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-start-capture",
+          "markdownDescription": "Enables the joycon_start_capture command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_start_capture command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-start-capture",
+          "markdownDescription": "Denies the joycon_start_capture command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_stop_capture command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-stop-capture",
+          "markdownDescription": "Enables the joycon_stop_capture command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_stop_capture command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-stop-capture",
+          "markdownDescription": "Denies the joycon_stop_capture command without any pre-configured scope."
+        },
+        {
+          "description": "Default permissions for the Joy-Con plugin\n#### This default permission set includes:\n\n- `allow-get-status`\n- `allow-get-mappings`\n- `allow-set-mapping`\n- `allow-reset-mappings`\n- `allow-set-enabled`\n- `allow-get-enabled`\n- `allow-list-actions`\n- `allow-start-capture`\n- `allow-stop-capture`\n- `allow-list-presets`\n- `allow-get-preset-mappings`\n- `allow-load-preset`\n- `allow-load-preset-from-url`\n- `allow-export-mappings`\n- `allow-import-mappings`\n- `allow-list-apps`\n- `allow-get-imu`\n- `allow-set-imu`\n- `allow-get-profiles`\n- `allow-save-profile`\n- `allow-delete-profile`\n- `allow-set-per-app-enabled`\n- `allow-get-per-app-enabled`\n- `allow-get-frontmost`\n- `allow-get-frontmost-app`",
+          "type": "string",
+          "const": "default",
+          "markdownDescription": "Default permissions for the Joy-Con plugin\n#### This default permission set includes:\n\n- `allow-get-status`\n- `allow-get-mappings`\n- `allow-set-mapping`\n- `allow-reset-mappings`\n- `allow-set-enabled`\n- `allow-get-enabled`\n- `allow-list-actions`\n- `allow-start-capture`\n- `allow-stop-capture`\n- `allow-list-presets`\n- `allow-get-preset-mappings`\n- `allow-load-preset`\n- `allow-load-preset-from-url`\n- `allow-export-mappings`\n- `allow-import-mappings`\n- `allow-list-apps`\n- `allow-get-imu`\n- `allow-set-imu`\n- `allow-get-profiles`\n- `allow-save-profile`\n- `allow-delete-profile`\n- `allow-set-per-app-enabled`\n- `allow-get-per-app-enabled`\n- `allow-get-frontmost`\n- `allow-get-frontmost-app`"
+        }
+      ]
+    }
+  }
+}

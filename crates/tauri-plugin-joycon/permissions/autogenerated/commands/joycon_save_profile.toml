@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-save-profile"
+description = "Enables the joycon_save_profile command without any pre-configured scope."
+commands.allow = ["joycon_save_profile"]
+
+[[permission]]
+identifier = "deny-joycon-save-profile"
+description = "Denies the joycon_save_profile command without any pre-configured scope."
+commands.deny = ["joycon_save_profile"]

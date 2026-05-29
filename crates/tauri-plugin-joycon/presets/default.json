@@ -1,0 +1,9 @@
+{
+  "id": "default",
+  "name": "Default",
+  "description": "Minimal: ZL = transcribe",
+  "kind": "any",
+  "mappings": [
+    { "button": "zl", "action": "transcribe", "mode": "hold" }
+  ]
+}

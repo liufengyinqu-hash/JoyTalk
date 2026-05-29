@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-status"
+description = "Allow joycon_get_status command"
+commands.allow = ["joycon_get_status"]

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#ECFEFF"/>
+    </linearGradient>
+    <linearGradient id="ac6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#0E7490"/>
+    </linearGradient>
+    <filter id="g6"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1024" height="1024" rx="240" fill="url(#bg6)"/>
+  <!-- "J" letterform built from waveform bars -->
+  <g transform="translate(380, 240)" filter="url(#g6)">
+    <!-- top of J - horizontal cap -->
+    <rect x="0" y="0" width="280" height="60" rx="30" fill="url(#ac6)" opacity="0.6"/>
+    <!-- vertical stem made of stacked bars getting larger -->
+    <rect x="190" y="80" width="60" height="80" rx="20" fill="url(#ac6)" opacity="0.7"/>
+    <rect x="190" y="180" width="60" height="120" rx="20" fill="url(#ac6)" opacity="0.85"/>
+    <rect x="190" y="320" width="60" height="160" rx="20" fill="url(#ac6)"/>
+    <!-- hook at bottom -->
+    <path d="M 200 480 Q 200 580 100 580 Q 0 580 0 460" fill="none" stroke="url(#ac6)" stroke-width="60" stroke-linecap="round"/>
+  </g>
+</svg>

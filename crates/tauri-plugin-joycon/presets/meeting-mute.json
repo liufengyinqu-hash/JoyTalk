@@ -1,0 +1,10 @@
+{
+  "id": "meeting-mute",
+  "name": "Meeting Mute",
+  "description": "Any large button mutes recording instantly",
+  "kind": "any",
+  "mappings": [
+    { "button": "a", "action": "cancel", "mode": "tap" },
+    { "button": "b", "action": "cancel", "mode": "tap" }
+  ]
+}

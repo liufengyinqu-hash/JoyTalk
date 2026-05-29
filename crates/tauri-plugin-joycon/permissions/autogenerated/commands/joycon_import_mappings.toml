@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-import-mappings"
+description = "Enables the joycon_import_mappings command without any pre-configured scope."
+commands.allow = ["joycon_import_mappings"]
+
+[[permission]]
+identifier = "deny-joycon-import-mappings"
+description = "Denies the joycon_import_mappings command without any pre-configured scope."
+commands.deny = ["joycon_import_mappings"]

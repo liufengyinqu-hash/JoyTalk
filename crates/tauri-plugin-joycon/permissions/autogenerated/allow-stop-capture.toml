@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-stop-capture"
+description = "Allow joycon_stop_capture command"
+commands.allow = ["joycon_stop_capture"]

@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-stop-capture"
+description = "Enables the joycon_stop_capture command without any pre-configured scope."
+commands.allow = ["joycon_stop_capture"]
+
+[[permission]]
+identifier = "deny-joycon-stop-capture"
+description = "Denies the joycon_stop_capture command without any pre-configured scope."
+commands.deny = ["joycon_stop_capture"]

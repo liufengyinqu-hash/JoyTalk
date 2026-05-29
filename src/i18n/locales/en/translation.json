@@ -11,6 +11,7 @@
   "sidebar": {
     "general": "General",
     "models": "Models",
+    "plugins": "Plugins",
     "advanced": "Advanced",
     "postProcessing": "Post Process",
     "history": "History",
@@ -100,7 +101,7 @@
     },
     "permissions": {
       "title": "Permissions Required",
-      "description": "Handy needs a couple of permissions to work properly.",
+      "description": "JoyTalk needs a couple of permissions to work properly.",
       "microphone": {
         "title": "Microphone Access",
         "description": "Required to hear your voice for transcription."
@@ -158,7 +159,7 @@
     "general": {
       "title": "General",
       "shortcut": {
-        "title": "Handy Shortcuts",
+        "title": "JoyTalk Shortcuts",
         "description": "Configure keyboard shortcuts to trigger speech-to-text recording",
         "loading": "Loading shortcuts...",
         "none": "No shortcuts configured",
@@ -276,11 +277,11 @@
       },
       "autostart": {
         "label": "Launch on Startup",
-        "description": "Automatically start Handy when you log in to your computer."
+        "description": "Automatically start JoyTalk when you log in to your computer."
       },
       "showTrayIcon": {
         "label": "Show Tray Icon",
-        "description": "Display the Handy icon in the system tray."
+        "description": "Display the JoyTalk icon in the system tray."
       },
       "overlay": {
         "title": "Overlay Position",
@@ -445,7 +446,7 @@
       },
       "updateChecks": {
         "label": "Check for Updates",
-        "description": "Automatically check for new versions of Handy"
+        "description": "Automatically check for new versions of JoyTalk"
       },
       "soundTheme": {
         "label": "Sound Theme",
@@ -513,11 +514,11 @@
       "title": "About",
       "version": {
         "title": "Version",
-        "description": "Current version of Handy"
+        "description": "Current version of JoyTalk"
       },
       "appDataDirectory": {
         "title": "App Data Directory",
-        "description": "Location where Handy stores its data"
+        "description": "Location where JoyTalk stores its data"
       },
       "sourceCode": {
         "title": "Source Code",
@@ -526,15 +527,17 @@
       },
       "supportDevelopment": {
         "title": "Support Development",
-        "description": "Help us continue building Handy",
-        "button": "Donate"
+        "description": "Scan with Alipay to support JoyTalk development",
+        "button": "Donate",
+        "alipayAlt": "Alipay donation QR code",
+        "alipayCaption": "Scan with Alipay to support development. Thank you!"
       },
       "acknowledgments": {
         "title": "Acknowledgments",
         "whisper": {
           "title": "Whisper.cpp",
           "description": "High-performance inference of OpenAI's Whisper automatic speech recognition model",
-          "details": "Handy uses Whisper.cpp for fast, local speech-to-text processing. Thanks to the amazing work by Georgi Gerganov and contributors."
+          "details": "JoyTalk uses Whisper.cpp for fast, local speech-to-text processing. Thanks to the amazing work by Georgi Gerganov and contributors."
         }
       }
     }
@@ -580,7 +583,7 @@
   },
   "accessibility": {
     "permissionsRequired": "Accessibility Permissions Required",
-    "permissionsDescription": "Handy needs accessibility permissions to type transcribed text.",
+    "permissionsDescription": "JoyTalk needs accessibility permissions to type transcribed text.",
     "openSettings": "Open System Settings",
     "dismiss": "Dismiss"
   },
@@ -603,10 +606,41 @@
   },
   "appLanguage": {
     "title": "Application Language",
-    "description": "Change the language of the Handy interface"
+    "description": "Change the language of the JoyTalk interface"
   },
   "overlay": {
     "transcribing": "Transcribing...",
     "processing": "Processing..."
+  },
+  "joycon": {
+    "bindings": {
+      "title": "Joy-Con Bindings",
+      "enable": {
+        "label": "Enable Joy-Con",
+        "desc": "Use a Nintendo Switch Joy-Con as input source"
+      },
+      "transcribe": {
+        "label": "Transcribe button",
+        "desc": "Joy-Con button to start (or hold for) transcription"
+      },
+      "cancel": {
+        "label": "Cancel button",
+        "desc": "Joy-Con button to cancel an active recording"
+      },
+      "ptt": {
+        "label": "Push-to-talk",
+        "desc": "Hold the transcribe button to record (release to stop). Off = tap to toggle."
+      },
+      "status": {
+        "label": "Status",
+        "desc": "Joy-Con connection state"
+      },
+      "none": "— none —",
+      "capture": {
+        "btn": "Press JC",
+        "hint": "Press a Joy-Con button to capture"
+      },
+      "disconnected": "○ Not connected — pair via macOS Bluetooth settings"
+    }
   }
 }

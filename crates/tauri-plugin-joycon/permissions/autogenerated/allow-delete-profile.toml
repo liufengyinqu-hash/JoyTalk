@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-delete-profile"
+description = "Allow joycon_delete_profile command"
+commands.allow = ["joycon_delete_profile"]

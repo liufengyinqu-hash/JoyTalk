@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-reset-mappings"
+description = "Allow joycon_reset_mappings command"
+commands.allow = ["joycon_reset_mappings"]

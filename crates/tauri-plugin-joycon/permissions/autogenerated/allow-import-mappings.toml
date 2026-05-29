@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-import-mappings"
+description = "Allow joycon_import_mappings command"
+commands.allow = ["joycon_import_mappings"]

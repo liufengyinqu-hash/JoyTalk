@@ -9,6 +9,8 @@ import { AppDataDirectory } from "../AppDataDirectory";
 import { AppLanguageSelector } from "../AppLanguageSelector";
 import { LogDirectory } from "../debug";
 
+const ALIPAY_QR_SRC = "/donate/alipay-qr.png";
+
 export const AboutSettings: React.FC = () => {
   const { t } = useTranslation();
   const [version, setVersion] = useState("");
@@ -27,14 +29,6 @@ export const AboutSettings: React.FC = () => {
     fetchVersion();
   }, []);
 
-  const handleDonateClick = async () => {
-    try {
-      await openUrl("https://handy.computer/donate");
-    } catch (error) {
-      console.error("Failed to open donate link:", error);
-    }
-  };
-
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
       <SettingsGroup title={t("settings.about.title")}>
@@ -52,10 +46,18 @@ export const AboutSettings: React.FC = () => {
           title={t("settings.about.supportDevelopment.title")}
           description={t("settings.about.supportDevelopment.description")}
           grouped={true}
+          layout="stacked"
         >
-          <Button variant="primary" size="md" onClick={handleDonateClick}>
-            {t("settings.about.supportDevelopment.button")}
-          </Button>
+          <div className="flex flex-col items-start gap-2">
+            <img
+              src={ALIPAY_QR_SRC}
+              alt={t("settings.about.supportDevelopment.alipayAlt")}
+              className="max-w-[180px] w-full h-auto rounded-xl border border-border bg-surface object-contain"
+            />
+            <p className="text-sm text-text-secondary">
+              {t("settings.about.supportDevelopment.alipayCaption")}
+            </p>
+          </div>
         </SettingContainer>
 
         <SettingContainer
@@ -66,7 +68,7 @@ export const AboutSettings: React.FC = () => {
           <Button
             variant="secondary"
             size="md"
-            onClick={() => openUrl("https://github.com/cjpais/Handy")}
+            onClick={() => openUrl("https://github.com/liufengyinqu-hash/JoyTalk")}
           >
             {t("settings.about.sourceCode.button")}
           </Button>

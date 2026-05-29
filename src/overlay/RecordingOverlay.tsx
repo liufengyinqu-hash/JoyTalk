@@ -1,4 +1,5 @@
 import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/core";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -13,6 +14,11 @@ import { getLanguageDirection } from "@/lib/utils/rtl";
 
 type OverlayState = "recording" | "transcribing" | "processing";
 
+interface FrontmostApp {
+  name: string;
+  bundle_id: string;
+}
+
 const RecordingOverlay: React.FC = () => {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
@@ -20,42 +26,58 @@ const RecordingOverlay: React.FC = () => {
   const [levels, setLevels] = useState<number[]>(Array(16).fill(0));
   const smoothedLevelsRef = useRef<number[]>(Array(16).fill(0));
   const direction = getLanguageDirection(i18n.language);
+  const [appName, setAppName] = useState<string>("");
 
   useEffect(() => {
     const setupEventListeners = async () => {
-      // Listen for show-overlay event from Rust
       const unlistenShow = await listen("show-overlay", async (event) => {
-        // Sync language from settings each time overlay is shown
         await syncLanguageFromSettings();
         const overlayState = event.payload as OverlayState;
         setState(overlayState);
         setIsVisible(true);
+        try {
+          const f = await invoke<FrontmostApp | null>(
+            "plugin:joycon|joycon_get_frontmost_app",
+          );
+          if (f && f.name) setAppName(f.name);
+        } catch {
+          // ignore
+        }
       });
 
-      // Listen for hide-overlay event from Rust
       const unlistenHide = await listen("hide-overlay", () => {
         setIsVisible(false);
       });
 
-      // Listen for mic-level updates
       const unlistenLevel = await listen<number[]>("mic-level", (event) => {
         const newLevels = event.payload as number[];
-
-        // Apply smoothing to reduce jitter
         const smoothed = smoothedLevelsRef.current.map((prev, i) => {
           const target = newLevels[i] || 0;
-          return prev * 0.7 + target * 0.3; // Smooth transition
+          return prev * 0.7 + target * 0.3;
         });
-
         smoothedLevelsRef.current = smoothed;
         setLevels(smoothed.slice(0, 9));
       });
 
-      // Cleanup function
+      const unlistenFront = await listen<string | null>(
+        "joycon://frontmost_changed",
+        async () => {
+          try {
+            const f = await invoke<FrontmostApp | null>(
+              "plugin:joycon|joycon_get_frontmost_app",
+            );
+            if (f && f.name) setAppName(f.name);
+          } catch {
+            // ignore
+          }
+        },
+      );
+
       return () => {
         unlistenShow();
         unlistenHide();
         unlistenLevel();
+        unlistenFront();
       };
     };
 
@@ -64,9 +86,9 @@ const RecordingOverlay: React.FC = () => {
 
   const getIcon = () => {
     if (state === "recording") {
-      return <MicrophoneIcon />;
+      return <MicrophoneIcon width={36} height={36} color="#22D3EE" className="overlay-icon" />;
     } else {
-      return <TranscriptionIcon />;
+      return <TranscriptionIcon width={36} height={36} color="#22D3EE" className="overlay-icon" />;
     }
   };
 
@@ -79,18 +101,22 @@ const RecordingOverlay: React.FC = () => {
 
       <div className="overlay-middle">
         {state === "recording" && (
-          <div className="bars-container">
-            {levels.map((v, i) => (
-              <div
-                key={i}
-                className="bar"
-                style={{
-                  height: `${Math.min(20, 4 + Math.pow(v, 0.7) * 16)}px`, // Cap at 20px max height
-                  transition: "height 60ms ease-out, opacity 120ms ease-out",
-                  opacity: Math.max(0.2, v * 1.7), // Minimum opacity for visibility
-                }}
-              />
-            ))}
+          <div className="recording-content">
+            {appName && <div className="app-tag">{appName}</div>}
+            <div className="bars-container">
+              {levels.map((v, i) => (
+                <div
+                  key={i}
+                  className="bar"
+                  style={{
+                    height: `${Math.min(20, 4 + Math.pow(v, 0.7) * 16)}px`,
+                    transition:
+                      "height 60ms ease-out, opacity 120ms ease-out",
+                    opacity: Math.max(0.2, v * 1.7),
+                  }}
+                />
+              ))}
+            </div>
           </div>
         )}
         {state === "transcribing" && (

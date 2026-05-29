@@ -4,5 +4,15 @@
 <dict>
   <key>NSMicrophoneUsageDescription</key>
   <string>Request microphone access to transcribe audio locally</string>
+  <key>NSBluetoothAlwaysUsageDescription</key>
+  <string>Pair with Joy-Con controllers for push-to-talk</string>
+  <key>NSBluetoothPeripheralUsageDescription</key>
+  <string>Communicate with Joy-Con controllers</string>
+  <key>LSUIElement</key>
+  <false/>
+  <key>LSBackgroundOnly</key>
+  <false/>
+  <key>LSApplicationCategoryType</key>
+  <string>public.app-category.productivity</string>
 </dict>
 </plist>

@@ -1,11 +1,11 @@
 [package]
-name = "handy"
-version = "0.8.3"
-description = "Handy"
+name = "joytalk"
+version = "1.0.1"
+description = "JoyTalk"
 authors = ["cjpais"]
 edition = "2021"
 license = "MIT"
-default-run = "handy"
+default-run = "joytalk"
 
 [profile.dev]
 incremental = true # Compile your binary in smaller steps.
@@ -16,7 +16,7 @@ incremental = true # Compile your binary in smaller steps.
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "handy_app_lib"
+name = "joytalk_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 # [[bin]]
@@ -77,6 +77,8 @@ specta = "=2.0.0-rc.22"
 specta-typescript = "0.0.9"
 tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
 tauri-plugin-dialog = "2.6"
+joycon-rs = "0.6"
+tauri-plugin-joycon = { path = "../crates/tauri-plugin-joycon" }
 
 [target.'cfg(unix)'.dependencies]
 signal-hook = "0.3"

@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-preset-mappings"
+description = "Allow joycon_get_preset_mappings command"
+commands.allow = ["joycon_get_preset_mappings"]

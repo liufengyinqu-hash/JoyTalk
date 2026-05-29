@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Cog, FlaskConical, History, Info, Sparkles, Cpu } from "lucide-react";
-import HandyTextLogo from "./icons/HandyTextLogo";
-import HandyHand from "./icons/HandyHand";
+import { Cog, FlaskConical, History, Info, Sparkles, Cpu, Puzzle } from "lucide-react";
+import JoyTalkTextLogo from "./icons/JoyTalkTextLogo";
+import JoyTalkLogo from "./icons/JoyTalkLogo";
 import { useSettings } from "../hooks/useSettings";
 import {
   GeneralSettings,
@@ -13,6 +13,7 @@ import {
   PostProcessingSettings,
   ModelsSettings,
 } from "./settings";
+import { PluginsPage } from "./plugins/PluginsPage";
 
 export type SidebarSection = keyof typeof SECTIONS_CONFIG;
 
@@ -34,7 +35,7 @@ interface SectionConfig {
 export const SECTIONS_CONFIG = {
   general: {
     labelKey: "sidebar.general",
-    icon: HandyHand,
+    icon: JoyTalkLogo,
     component: GeneralSettings,
     enabled: () => true,
   },
@@ -42,6 +43,12 @@ export const SECTIONS_CONFIG = {
     labelKey: "sidebar.models",
     icon: Cpu,
     component: ModelsSettings,
+    enabled: () => true,
+  },
+  plugins: {
+    labelKey: "sidebar.plugins",
+    icon: Puzzle,
+    component: PluginsPage,
     enabled: () => true,
   },
   advanced: {
@@ -93,34 +100,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
     .map(([id, config]) => ({ id: id as SidebarSection, ...config }));
 
   return (
-    <div className="flex flex-col w-40 h-full border-e border-mid-gray/20 items-center px-2">
-      <HandyTextLogo width={120} className="m-4" />
-      <div className="flex flex-col w-full items-center gap-1 pt-2 border-t border-mid-gray/20">
+    <aside
+      className="flex flex-col w-44 h-full surface-2 border-r border-border select-none"
+      style={{ WebkitAppRegion: "drag" } as React.CSSProperties}
+    >
+      <div className="h-7" /> {/* traffic-light spacer */}
+      <div className="px-3 pb-3 flex items-center gap-2">
+        <JoyTalkLogo width={22} height={22} />
+        <JoyTalkTextLogo width={86} className="text-text" />
+      </div>
+      <nav
+        className="flex flex-col gap-[1px] px-2 pt-2 border-t border-border"
+        style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+      >
         {availableSections.map((section) => {
           const Icon = section.icon;
           const isActive = activeSection === section.id;
 
           return (
-            <div
+            <button
               key={section.id}
-              className={`flex gap-2 items-center p-2 w-full rounded-lg cursor-pointer transition-colors ${
-                isActive
-                  ? "bg-logo-primary/80"
-                  : "hover:bg-mid-gray/20 hover:opacity-100 opacity-85"
-              }`}
+              type="button"
               onClick={() => onSectionChange(section.id)}
+              className={`flex gap-2 items-center px-2.5 py-[6px] w-full rounded-md text-left transition-colors ${
+                isActive
+                  ? "bg-accent/15 text-accent"
+                  : "text-text hover:bg-text/[0.04]"
+              }`}
+              title={t(section.labelKey)}
             >
-              <Icon width={24} height={24} className="shrink-0" />
-              <p
-                className="text-sm font-medium truncate"
-                title={t(section.labelKey)}
-              >
+              <Icon
+                width={15}
+                height={15}
+                className={`shrink-0 ${isActive ? "text-accent" : "text-text-secondary"}`}
+              />
+              <span className="text-[13px] font-medium truncate">
                 {t(section.labelKey)}
-              </p>
-            </div>
+              </span>
+            </button>
           );
         })}
-      </div>
-    </div>
+      </nav>
+    </aside>
   );
 };

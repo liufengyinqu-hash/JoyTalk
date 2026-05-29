@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="ac2" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#67E8F9"/>
+      <stop offset="100%" stop-color="#22D3EE"/>
+    </linearGradient>
+    <filter id="glow2" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="240" fill="url(#bg2)"/>
+  <g transform="translate(512, 512)" filter="url(#glow2)">
+    <rect x="-360" y="-30" width="36" height="60" rx="18" fill="url(#ac2)" opacity="0.45"/>
+    <rect x="-280" y="-70" width="36" height="140" rx="18" fill="url(#ac2)" opacity="0.6"/>
+    <rect x="-200" y="-130" width="36" height="260" rx="18" fill="url(#ac2)" opacity="0.78"/>
+    <rect x="-120" y="-200" width="44" height="400" rx="22" fill="url(#ac2)"/>
+    <rect x="-32" y="-250" width="44" height="500" rx="22" fill="url(#ac2)"/>
+    <rect x="56" y="-180" width="44" height="360" rx="22" fill="url(#ac2)" opacity="0.92"/>
+    <rect x="144" y="-110" width="36" height="220" rx="18" fill="url(#ac2)" opacity="0.78"/>
+    <rect x="220" y="-150" width="36" height="300" rx="18" fill="url(#ac2)" opacity="0.65"/>
+    <rect x="296" y="-60" width="36" height="120" rx="18" fill="url(#ac2)" opacity="0.5"/>
+  </g>
+</svg>

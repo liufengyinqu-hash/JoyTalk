@@ -1,0 +1,11 @@
+{
+  "id": "two-button-transcribe",
+  "name": "Two-Button Transcribe",
+  "description": "ZL = start, ZR = stop, Minus = cancel",
+  "kind": "any",
+  "mappings": [
+    { "button": "zl", "action": "start_transcribe", "mode": "tap" },
+    { "button": "zr", "action": "stop_transcribe", "mode": "tap" },
+    { "button": "minus", "action": "cancel", "mode": "tap" }
+  ]
+}

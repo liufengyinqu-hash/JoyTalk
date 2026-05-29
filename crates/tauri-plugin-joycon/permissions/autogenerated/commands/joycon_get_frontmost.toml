@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-get-frontmost"
+description = "Enables the joycon_get_frontmost command without any pre-configured scope."
+commands.allow = ["joycon_get_frontmost"]
+
+[[permission]]
+identifier = "deny-joycon-get-frontmost"
+description = "Denies the joycon_get_frontmost command without any pre-configured scope."
+commands.deny = ["joycon_get_frontmost"]

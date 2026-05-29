@@ -501,6 +501,10 @@
     url = "https://registry.npmjs.org/@tauri-apps/api/-/api-2.10.1.tgz";
     hash = "sha512-hKL/jWf293UDSUN09rR69hrToyIXBb8CjGaWC7gfinvnQrBVvnLr08FeFi38gxtugAVyVcTa5/FD/Xnkb1siBw==";
   };
+  "@tauri-apps/api@2.11.0" = fetchurl {
+    url = "https://registry.npmjs.org/@tauri-apps/api/-/api-2.11.0.tgz";
+    hash = "sha512-7CinYODhky9lmO23xHnUFv0Xt43fbtWMyxZcLcRBlFkcgXKuEirBvHpmtJ89YMhyeGcq20Wuc47Fa4XjyniywA==";
+  };
   "@tauri-apps/api@2.9.0" = fetchurl {
     url = "https://registry.npmjs.org/@tauri-apps/api/-/api-2.9.0.tgz";
     hash = "sha512-qD5tMjh7utwBk9/5PrTA/aGr3i5QaJ/Mlt7p8NilQ45WgbifUNPyKWsA63iQ8YfQq6R8ajMapU+/Q8nMcPRLNw==";
@@ -561,13 +565,13 @@
     url = "https://registry.npmjs.org/@tauri-apps/plugin-clipboard-manager/-/plugin-clipboard-manager-2.3.2.tgz";
     hash = "sha512-CUlb5Hqi2oZbcZf4VUyUH53XWPPdtpw43EUpCza5HWZJwxEoDowFzNUDt1tRUXA8Uq+XPn17Ysfptip33sG4eQ==";
   };
-  "@tauri-apps/plugin-dialog@2.6.0" = fetchurl {
-    url = "https://registry.npmjs.org/@tauri-apps/plugin-dialog/-/plugin-dialog-2.6.0.tgz";
-    hash = "sha512-q4Uq3eY87TdcYzXACiYSPhmpBA76shgmQswGkSVio4C82Sz2W4iehe9TnKYwbq7weHiL88Yw19XZm7v28+Micg==";
+  "@tauri-apps/plugin-dialog@2.7.1" = fetchurl {
+    url = "https://registry.npmjs.org/@tauri-apps/plugin-dialog/-/plugin-dialog-2.7.1.tgz";
+    hash = "sha512-OK1UBXYt+ojcmxMktzzuyonYIFta8CmAASpX+CA+DTGK24KlHjhYI6x2iOJ/TjZF4N7/ACK1oFmEOjIY9IhzOQ==";
   };
-  "@tauri-apps/plugin-fs@2.4.4" = fetchurl {
-    url = "https://registry.npmjs.org/@tauri-apps/plugin-fs/-/plugin-fs-2.4.4.tgz";
-    hash = "sha512-MTorXxIRmOnOPT1jZ3w96vjSuScER38ryXY88vl5F0uiKdnvTKKTtaEjTEo8uPbl4e3gnUtfsDVwC7h77GQLvQ==";
+  "@tauri-apps/plugin-fs@2.5.1" = fetchurl {
+    url = "https://registry.npmjs.org/@tauri-apps/plugin-fs/-/plugin-fs-2.5.1.tgz";
+    hash = "sha512-9Lz+Jopp6QyeEWhlpkMx4R/+P9HgR+AVAI4vOZhlT8Xaymtz8iVI/Ov984/XTqgJz/5gz5NretqPB/XEMS3NhQ==";
   };
   "@tauri-apps/plugin-global-shortcut@2.3.1" = fetchurl {
     url = "https://registry.npmjs.org/@tauri-apps/plugin-global-shortcut/-/plugin-global-shortcut-2.3.1.tgz";

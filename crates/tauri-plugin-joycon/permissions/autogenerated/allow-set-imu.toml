@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-set-imu"
+description = "Allow joycon_set_imu command"
+commands.allow = ["joycon_set_imu"]

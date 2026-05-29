@@ -320,7 +320,7 @@ impl ModelManager {
                 supports_translation: false,
                 is_recommended: true,
                 supported_languages: parakeet_v3_languages,
-                supports_language_selection: false,
+                supports_language_selection: true,
                 is_custom: false,
             },
         );
@@ -499,7 +499,7 @@ impl ModelManager {
                 supports_translation: false,
                 is_recommended: false,
                 supported_languages: gigaam_languages,
-                supports_language_selection: false,
+                supports_language_selection: true,
                 is_custom: false,
             },
         );

@@ -57,6 +57,16 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     );
   }, [supportedLanguages]);
 
+  // Common languages pinned at top for quick access (filtered by model support)
+  const FAVORITES = ["auto", "en", "zh-Hans", "zh-Hant", "ja", "ko", "es", "fr", "de"];
+  const pinnedLanguages = useMemo(
+    () =>
+      FAVORITES.map((v) => availableLanguages.find((l) => l.value === v)).filter(
+        (l): l is { value: string; label: string } => !!l,
+      ),
+    [availableLanguages],
+  );
+
   const filteredLanguages = useMemo(
     () =>
       availableLanguages.filter((language) =>
@@ -151,6 +161,31 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
               </div>
 
               <div className="max-h-48 overflow-y-auto">
+                {searchQuery === "" && pinnedLanguages.length > 0 && (
+                  <div className="px-2 py-1 text-xs uppercase tracking-wider opacity-50">
+                    Quick
+                  </div>
+                )}
+                {searchQuery === "" &&
+                  pinnedLanguages.map((language) => (
+                    <button
+                      key={`pin-${language.value}`}
+                      type="button"
+                      className={`w-full px-2 py-1 text-sm text-start hover:bg-logo-primary/10 transition-colors duration-150 ${
+                        selectedLanguage === language.value
+                          ? "bg-logo-primary/20 text-logo-primary font-semibold"
+                          : ""
+                      }`}
+                      onClick={() => handleLanguageSelect(language.value)}
+                    >
+                      <span className="truncate">{language.label}</span>
+                    </button>
+                  ))}
+                {searchQuery === "" && pinnedLanguages.length > 0 && (
+                  <div className="px-2 py-1 text-xs uppercase tracking-wider opacity-50 border-t border-mid-gray/20 mt-1">
+                    All
+                  </div>
+                )}
                 {filteredLanguages.length === 0 ? (
                   <div className="px-2 py-2 text-sm text-mid-gray text-center">
                     {t("settings.general.language.noResults")}

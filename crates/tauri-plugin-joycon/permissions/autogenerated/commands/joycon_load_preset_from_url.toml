@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-load-preset-from-url"
+description = "Enables the joycon_load_preset_from_url command without any pre-configured scope."
+commands.allow = ["joycon_load_preset_from_url"]
+
+[[permission]]
+identifier = "deny-joycon-load-preset-from-url"
+description = "Denies the joycon_load_preset_from_url command without any pre-configured scope."
+commands.deny = ["joycon_load_preset_from_url"]

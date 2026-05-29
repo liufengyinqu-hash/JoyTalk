@@ -1,0 +1,11 @@
+{
+  "id": "vibe-coding",
+  "name": "Vibe Coding",
+  "description": "ZL/ZR for voice prompts in Claude Code / Cursor",
+  "kind": "any",
+  "mappings": [
+    { "button": "zl", "action": "transcribe", "mode": "hold" },
+    { "button": "zr", "action": "transcribe", "mode": "hold" },
+    { "button": "minus", "action": "cancel", "mode": "tap" }
+  ]
+}

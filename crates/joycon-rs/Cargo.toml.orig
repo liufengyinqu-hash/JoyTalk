@@ -1,0 +1,41 @@
+[package]
+name = "joycon-rs"
+version = "0.6.3"
+authors = ["Kaisei Yokoyama <yokoyama.kaisei.sm@alumni.tsukuba.ac.jp>"]
+repository = "https://github.com/KaiseiYokoyama/joycon-rs"
+edition = "2018"
+description = " a framework for dealing with Nintendo Switch Joy-Con on Rust easily and efficiently"
+readme = "README.md"
+categories = ["game-development", "hardware-support"]
+keywords = ["nintendo_switch", "joycon", "gamedev", "hid", "bluetooth"]
+license = "Apache-2.0"
+exclude = ["/images/*"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+hidapi = "1.3"
+crossbeam-channel = "0.5"
+lazy_static = "1.4"
+serde = { version = "1.0", features = ["derive"] , optional = true }
+
+[features]
+use_serde = ["serde"]
+
+[dev-dependencies]
+doc-comment = "0.3"
+
+[[example]]
+name = "scan_for_joycons"
+
+[[example]]
+name = "player_lights"
+
+[[example]]
+name = "standard_full_report"
+
+[[example]]
+name = "simple_hid_report"
+
+[[example]]
+name = "rumble"

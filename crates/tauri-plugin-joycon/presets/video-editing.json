@@ -1,0 +1,10 @@
+{
+  "id": "video-editing",
+  "name": "Video Editing",
+  "description": "Map common actions for editors (Premiere / FCP)",
+  "kind": "any",
+  "mappings": [
+    { "button": "a", "action": "transcribe", "mode": "hold" },
+    { "button": "minus", "action": "cancel", "mode": "tap" }
+  ]
+}

@@ -1,0 +1,31 @@
+"$schema" = "schemas/schema.json"
+
+[default]
+description = "Default permissions for the Joy-Con plugin"
+permissions = [
+    "allow-get-status",
+    "allow-get-mappings",
+    "allow-set-mapping",
+    "allow-reset-mappings",
+    "allow-set-enabled",
+    "allow-get-enabled",
+    "allow-list-actions",
+    "allow-start-capture",
+    "allow-stop-capture",
+    "allow-list-presets",
+    "allow-get-preset-mappings",
+    "allow-load-preset",
+    "allow-load-preset-from-url",
+    "allow-export-mappings",
+    "allow-import-mappings",
+    "allow-list-apps",
+    "allow-get-imu",
+    "allow-set-imu",
+    "allow-get-profiles",
+    "allow-save-profile",
+    "allow-delete-profile",
+    "allow-set-per-app-enabled",
+    "allow-get-per-app-enabled",
+    "allow-get-frontmost",
+    "allow-get-frontmost-app",
+]

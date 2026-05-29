@@ -1,0 +1,21 @@
+[workspace]
+resolver = "2"
+members = [
+    "src-tauri",
+    "crates/tauri-plugin-joycon",
+]
+exclude = [
+    "crates/joycon-rs",
+]
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+
+# Use a vendored, patched copy of joycon-rs. Upstream 0.6.3 panics
+# (`unreachable!()` in manager.rs) when a JoyCon fails to (re)open during a
+# scan — which crashes the scanner thread and leaves the app stuck
+# reconnecting forever after a Bluetooth reconnect. The local copy turns that
+# into a graceful skip-and-retry.
+[patch.crates-io]
+joycon-rs = { path = "crates/joycon-rs" }

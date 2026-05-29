@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-set-enabled"
+description = "Enables the joycon_set_enabled command without any pre-configured scope."
+commands.allow = ["joycon_set_enabled"]
+
+[[permission]]
+identifier = "deny-joycon-set-enabled"
+description = "Denies the joycon_set_enabled command without any pre-configured scope."
+commands.deny = ["joycon_set_enabled"]

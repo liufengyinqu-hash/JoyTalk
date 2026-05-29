@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-export-mappings"
+description = "Allow joycon_export_mappings command"
+commands.allow = ["joycon_export_mappings"]

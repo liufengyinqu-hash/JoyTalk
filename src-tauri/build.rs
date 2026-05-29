@@ -147,7 +147,10 @@ fn build_apple_intelligence_bridge() {
     // Check if the SDK supports FoundationModels (required for Apple Intelligence)
     let framework_path =
         Path::new(&sdk_path).join("System/Library/Frameworks/FoundationModels.framework");
-    let has_foundation_models = framework_path.exists();
+    // Allow override: JOYTALK_DISABLE_APPLE_INTELLIGENCE=1 forces stub build
+    // Needed when SDK has framework but missing FoundationModelsMacros plugin.
+    let has_foundation_models = framework_path.exists()
+        && env::var("JOYTALK_DISABLE_APPLE_INTELLIGENCE").ok().as_deref() != Some("1");
 
     let source_file = if has_foundation_models {
         println!("cargo:warning=Building with Apple Intelligence support.");

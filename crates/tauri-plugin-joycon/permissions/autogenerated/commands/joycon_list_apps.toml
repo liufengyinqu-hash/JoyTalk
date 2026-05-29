@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-list-apps"
+description = "Enables the joycon_list_apps command without any pre-configured scope."
+commands.allow = ["joycon_list_apps"]
+
+[[permission]]
+identifier = "deny-joycon-list-apps"
+description = "Denies the joycon_list_apps command without any pre-configured scope."
+commands.deny = ["joycon_list_apps"]

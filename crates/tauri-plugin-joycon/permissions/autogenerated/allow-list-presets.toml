@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-list-presets"
+description = "Allow joycon_list_presets command"
+commands.allow = ["joycon_list_presets"]

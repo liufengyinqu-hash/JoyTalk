@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-frontmost-app"
+description = "Allow joycon_get_frontmost_app command"
+commands.allow = ["joycon_get_frontmost_app"]

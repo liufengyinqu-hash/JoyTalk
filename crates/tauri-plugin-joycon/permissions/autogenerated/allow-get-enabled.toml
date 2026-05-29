@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-enabled"
+description = "Allow joycon_get_enabled command"
+commands.allow = ["joycon_get_enabled"]

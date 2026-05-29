@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-set-mapping"
+description = "Enables the joycon_set_mapping command without any pre-configured scope."
+commands.allow = ["joycon_set_mapping"]
+
+[[permission]]
+identifier = "deny-joycon-set-mapping"
+description = "Denies the joycon_set_mapping command without any pre-configured scope."
+commands.deny = ["joycon_set_mapping"]
