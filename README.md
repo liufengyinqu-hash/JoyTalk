@@ -1,6 +1,16 @@
 # JoyTalk
 
-<span style="color:#07C160">**交流群：微信群（请添加微信 `Klaus-hao0306` 备注 JoyTalk 进群）**</span>
+[![WeChat](https://img.shields.io/badge/%E5%BE%AE%E4%BF%A1-%E5%8A%A0%E5%85%A5%E4%BA%A4%E6%B5%81%E7%BE%A4-07C160?style=for-the-badge&logo=wechat&logoColor=white)](#%E5%BE%AE%E4%BF%A1%E4%BA%A4%E6%B5%81%E7%BE%A4)
+
+<details>
+<summary>📱 扫码或添加微信进群</summary>
+
+**微信号：`Klaus-hao0306`（备注 JoyTalk 进群）**
+
+> 二维码图片：将你的微信群二维码图片保存为 `wechat-qrcode.png` 放在仓库根目录，然后取消下面这行的注释即可显示：
+> <!-- ![微信群二维码](wechat-qrcode.png) -->
+
+</details>
 
 **免费、开源、可扩展的离线语音转文字桌面应用，支持 Joy-Con 手柄控制。**
 
