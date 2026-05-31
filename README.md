@@ -7,8 +7,7 @@
 
 **微信号：`Klaus-hao0306`（备注 JoyTalk 进群）**
 
-> 二维码图片：将你的微信群二维码图片保存为 `wechat-qrcode.png` 放在仓库根目录，然后取消下面这行的注释即可显示：
-> <!-- ![微信群二维码](wechat-qrcode.png) -->
+![微信群二维码](wechat-qrcode.png)
 
 </details>
 
