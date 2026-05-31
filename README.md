@@ -1,6 +1,6 @@
 # JoyTalk
 
-[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/invite/WVBeWsNXK4)
+**交流群：微信群（请添加微信 liufengyinqu 备注 JoyTalk 进群）**
 
 **免费、开源、可扩展的离线语音转文字桌面应用，支持 Joy-Con 手柄控制。**
 
@@ -146,7 +146,7 @@ joytalk --debug                   # 启用调试模式
 2. Fork 仓库并创建功能分支
 3. 在目标平台上充分测试
 4. 提交 Pull Request 并附上清晰的变更说明
-5. 加入 [Discord](https://discord.com/invite/WVBeWsNXK4) 讨论
+5. 加入微信群交流讨论
 
 ## 相关项目
 
