@@ -1,6 +1,6 @@
 # JoyTalk
 
-**交流群：微信群（请添加微信 liufengyinqu 备注 JoyTalk 进群）**
+<span style="color:#07C160">**交流群：微信群（请添加微信 `Klaus-hao0306` 备注 JoyTalk 进群）**</span>
 
 **免费、开源、可扩展的离线语音转文字桌面应用，支持 Joy-Con 手柄控制。**
 
