@@ -42,6 +42,14 @@ use crate::settings::{self, get_settings, ShortcutBinding};
 
 use super::handler::handle_shortcut_event;
 
+/// Returns true when another (always-on) binding already owns this hotkey string.
+pub(crate) fn hotkey_owned_by_static_binding(app: &AppHandle, hotkey: &str) -> bool {
+    let settings = get_settings(app);
+    settings.bindings.iter().any(|(id, b)| {
+        id != "cancel" && b.current_binding.eq_ignore_ascii_case(hotkey)
+    })
+}
+
 /// Commands that can be sent to the hotkey manager thread
 enum ManagerCommand {
     Register {
@@ -191,6 +199,14 @@ impl HandyKeysState {
         binding_id: &str,
         hotkey_string: &str,
     ) -> Result<(), String> {
+        if binding_to_hotkey.contains_key(binding_id) {
+            debug!(
+                "handy-keys shortcut already registered, skipping duplicate: {}",
+                binding_id
+            );
+            return Ok(());
+        }
+
         let hotkey: Hotkey = hotkey_string
             .parse()
             .map_err(|e| format!("Failed to parse hotkey '{}': {}", hotkey_string, e))?;
@@ -471,6 +487,13 @@ pub fn register_cancel_shortcut(app: &AppHandle) {
         let app_clone = app.clone();
         tauri::async_runtime::spawn(async move {
             if let Some(cancel_binding) = get_settings(&app_clone).bindings.get("cancel").cloned() {
+                if hotkey_owned_by_static_binding(&app_clone, &cancel_binding.current_binding) {
+                    debug!(
+                        "Cancel hotkey '{}' already registered via transcribe/other binding; skipping duplicate register",
+                        cancel_binding.current_binding
+                    );
+                    return;
+                }
                 if let Some(state) = app_clone.try_state::<HandyKeysState>() {
                     if let Err(e) = state.register(&cancel_binding) {
                         error!("Failed to register cancel shortcut: {}", e);

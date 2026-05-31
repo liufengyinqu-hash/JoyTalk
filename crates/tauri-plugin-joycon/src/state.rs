@@ -1,6 +1,9 @@
 //! Shared atomic / mutex state across listener threads + commands.
 
-use crate::types::{AppProfile, ButtonMapping, ConnectedController, ControllerKind, ImuConfig, JoyConStatus};
+use crate::types::{
+    AppProfile, ButtonMapping, ConnectedController, ControllerKind, ImuConfig, IrLiveSample,
+    JoyConStatus, McuConfig, McuMode, McuRuntime, McuStatus, NfcLiveSample,
+};
 use std::collections::HashSet;
 use std::sync::atomic::{AtomicBool, AtomicU8};
 use std::sync::{Arc, Mutex};
@@ -19,6 +22,11 @@ pub struct State {
     pub capture_mode: Arc<AtomicBool>,
     pub seen_serials: Arc<Mutex<HashSet<String>>>,
     pub imu: Arc<Mutex<ImuConfig>>,
+    pub mcu: Arc<Mutex<McuConfig>>,
+    pub mcu_runtime: Arc<Mutex<McuRuntime>>,
+    pub ir_sample: Arc<Mutex<IrLiveSample>>,
+    pub nfc_sample: Arc<Mutex<NfcLiveSample>>,
+    pub nfc_rescan: Arc<AtomicBool>,
     pub profiles: Arc<Mutex<Vec<AppProfile>>>,
     pub per_app_enabled: Arc<AtomicBool>,
     pub frontmost_bundle: Arc<Mutex<Option<String>>>,
@@ -31,6 +39,7 @@ impl State {
         mappings: Vec<ButtonMapping>,
         seen_serials: HashSet<String>,
         imu: ImuConfig,
+        mcu: McuConfig,
         profiles: Vec<AppProfile>,
         per_app_enabled: bool,
     ) -> Self {
@@ -46,6 +55,11 @@ impl State {
             capture_mode: Arc::new(AtomicBool::new(false)),
             seen_serials: Arc::new(Mutex::new(seen_serials)),
             imu: Arc::new(Mutex::new(imu)),
+            mcu: Arc::new(Mutex::new(mcu)),
+            mcu_runtime: Arc::new(Mutex::new(McuRuntime::default())),
+            ir_sample: Arc::new(Mutex::new(IrLiveSample::default())),
+            nfc_sample: Arc::new(Mutex::new(NfcLiveSample::default())),
+            nfc_rescan: Arc::new(AtomicBool::new(false)),
             profiles: Arc::new(Mutex::new(profiles)),
             per_app_enabled: Arc::new(AtomicBool::new(per_app_enabled)),
             frontmost_bundle: Arc::new(Mutex::new(None)),
@@ -70,6 +84,40 @@ impl State {
         if let Ok(mut list) = self.connected_controllers.lock() {
             list.clear();
         }
+        if let Ok(mut s) = self.ir_sample.lock() {
+            *s = IrLiveSample::default();
+        }
+        if let Ok(mut s) = self.nfc_sample.lock() {
+            *s = NfcLiveSample::default();
+        }
+        self.set_mcu_runtime(McuRuntime::default());
+    }
+
+    pub fn mcu_runtime_snapshot(&self) -> McuRuntime {
+        self.mcu_runtime.lock().map(|g| *g).unwrap_or_default()
+    }
+
+    pub fn mcu_status_snapshot(&self) -> McuStatus {
+        let config = self.mcu.lock().map(|g| g.clone()).unwrap_or_default();
+        McuStatus::from_parts(config, self.mcu_runtime_snapshot())
+    }
+
+    pub fn set_mcu_runtime(&self, runtime: McuRuntime) {
+        if let Ok(mut r) = self.mcu_runtime.lock() {
+            *r = runtime;
+        }
+    }
+
+    pub fn set_ir_sample(&self, sample: IrLiveSample) {
+        if let Ok(mut s) = self.ir_sample.lock() {
+            *s = sample;
+        }
+    }
+
+    pub fn set_nfc_sample(&self, sample: NfcLiveSample) {
+        if let Ok(mut s) = self.nfc_sample.lock() {
+            *s = sample;
+        }
     }
 
     pub fn snapshot(&self) -> JoyConStatus {
@@ -92,10 +140,8 @@ impl State {
     pub fn active_mappings(&self) -> Vec<ButtonMapping> {
         use std::sync::atomic::Ordering::Relaxed;
         if self.per_app_enabled.load(Relaxed) {
-            if let (Ok(front), Ok(profiles)) = (
-                self.frontmost_bundle.lock(),
-                self.profiles.lock(),
-            ) {
+            if let (Ok(front), Ok(profiles)) = (self.frontmost_bundle.lock(), self.profiles.lock())
+            {
                 if let Some(b) = front.as_deref() {
                     if let Some(p) = profiles.iter().find(|p| p.bundle_id == b) {
                         return p.mappings.clone();
@@ -103,9 +149,6 @@ impl State {
                 }
             }
         }
-        self.mappings
-            .lock()
-            .map(|g| g.clone())
-            .unwrap_or_default()
+        self.mappings.lock().map(|g| g.clone()).unwrap_or_default()
     }
 }

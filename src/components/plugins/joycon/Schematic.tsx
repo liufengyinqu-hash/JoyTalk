@@ -128,8 +128,7 @@ const LEFT_LAYOUT: LayoutDef = {
 };
 
 // Joy-Con (R), held vertically: neon-red body, ABXY diamond on top, analog
-// stick below, plus button, round Home button at the bottom, and the SL/SR
-// rail on the inner (left) edge.
+// stick below, plus button, IR window above Home at the bottom, NFC on R stick.
 const RIGHT_LAYOUT: LayoutDef = {
   width: 150,
   height: 360,
@@ -149,9 +148,13 @@ const RIGHT_LAYOUT: LayoutDef = {
     { id: "r_stick_down", label: "", shape: "circle", x: 75, y: 248, r: 5 },
     { id: "r_stick_left", label: "", shape: "circle", x: 43, y: 216, r: 5 },
     { id: "r_stick_right", label: "", shape: "circle", x: 107, y: 216, r: 5 },
+    // NFC 读卡区：右摇杆（贴卡位置）
+    { id: "nfc_tag_present", label: "NFC", shape: "circle", x: 75, y: 216, r: 12 },
+    // IR 接近感应：Home 键上方黑窗
+    { id: "ir_proximity", label: "IR", shape: "circle", x: 52, y: 284, r: 7 },
     { id: "home", label: "⌂", shape: "circle", x: 75, y: 312, r: 10 },
-    { id: "sl_right", label: "SL", shape: "rect", x: 12, y: 110, w: 8, h: 58 },
-    { id: "sr_right", label: "SR", shape: "rect", x: 12, y: 178, w: 8, h: 58 },
+    { id: "sl_right", label: "SL", shape: "rect", x: 12, y: 178, w: 8, h: 58 },
+    { id: "sr_right", label: "SR", shape: "rect", x: 12, y: 110, w: 8, h: 58 },
   ],
 };
 
@@ -275,7 +278,11 @@ export const Schematic: React.FC<Props> = ({
         const isConnected = connectedKinds.includes(def.kind);
         const glowPad = 8;
         return (
-          <g key={idx} transform={`translate(${ofx}, ${ofy})`}>
+          <g
+            key={idx}
+            transform={`translate(${ofx}, ${ofy})`}
+            opacity={isConnected ? 1 : 0.42}
+          >
             {/* 外层光晕在机身后面，露出边缘一圈 */}
             {isConnected && (
               <rect

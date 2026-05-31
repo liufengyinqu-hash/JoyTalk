@@ -36,7 +36,9 @@ export type JoyConButton =
   | "tilt_left"
   | "tilt_right"
   | "shake_horizontal"
-  | "shake_vertical";
+  | "shake_vertical"
+  | "ir_proximity"
+  | "nfc_tag_present";
 
 export type TriggerMode = "hold" | "tap" | "double_tap" | "long_press" | "repeat";
 
@@ -117,6 +119,8 @@ export const ALL_BUTTONS: JoyConButton[] = [
   "shake", "flip_up", "flip_down",
   "tilt_left", "tilt_right",
   "shake_horizontal", "shake_vertical",
+  "ir_proximity",
+  "nfc_tag_present",
 ];
 
 export const BUTTON_LABELS: Record<JoyConButton, string> = {
@@ -138,6 +142,8 @@ export const BUTTON_LABELS: Record<JoyConButton, string> = {
   tilt_right: "↻ 右倾",
   shake_horizontal: "↔ 横晃",
   shake_vertical: "↕ 竖晃",
+  ir_proximity: "📡 IR 接近",
+  nfc_tag_present: "🏷 NFC 标签",
 };
 
 export const MODE_LABELS: Record<TriggerMode, string> = {

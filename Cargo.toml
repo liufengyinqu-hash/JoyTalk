@@ -6,6 +6,7 @@ members = [
 ]
 exclude = [
     "crates/joycon-rs",
+    "crates/joycon-sys",
 ]
 
 [workspace.package]

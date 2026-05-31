@@ -61,3 +61,8 @@ impl<'a> Debug for DebugHidDevice<'a> {
 pub mod device;
 mod driver;
 mod manager;
+
+#[cfg(feature = "ir")]
+pub mod ir;
+#[cfg(feature = "ir")]
+pub mod nfc;

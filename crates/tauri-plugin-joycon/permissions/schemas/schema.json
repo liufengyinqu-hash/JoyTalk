@@ -331,10 +331,28 @@
           "markdownDescription": "Allow joycon_get_imu command"
         },
         {
+          "description": "Allow joycon_get_ir_sample command",
+          "type": "string",
+          "const": "allow-get-ir-sample",
+          "markdownDescription": "Allow joycon_get_ir_sample command"
+        },
+        {
+          "description": "Allow joycon_get_ir command",
+          "type": "string",
+          "const": "allow-get-ir",
+          "markdownDescription": "Allow joycon_get_ir command"
+        },
+        {
           "description": "Allow joycon_get_mappings command",
           "type": "string",
           "const": "allow-get-mappings",
           "markdownDescription": "Allow joycon_get_mappings command"
+        },
+        {
+          "description": "Allow joycon_get_nfc_sample command",
+          "type": "string",
+          "const": "allow-get-nfc-sample",
+          "markdownDescription": "Allow joycon_get_nfc_sample command"
         },
         {
           "description": "Allow joycon_get_per_app_enabled command",
@@ -403,6 +421,12 @@
           "markdownDescription": "Allow joycon_reset_mappings command"
         },
         {
+          "description": "Allow joycon_restart_nfc_scan command",
+          "type": "string",
+          "const": "allow-restart-nfc-scan",
+          "markdownDescription": "Allow joycon_restart_nfc_scan command"
+        },
+        {
           "description": "Allow joycon_save_profile command",
           "type": "string",
           "const": "allow-save-profile",
@@ -419,6 +443,12 @@
           "type": "string",
           "const": "allow-set-imu",
           "markdownDescription": "Allow joycon_set_imu command"
+        },
+        {
+          "description": "Allow joycon_set_ir command",
+          "type": "string",
+          "const": "allow-set-ir",
+          "markdownDescription": "Allow joycon_set_ir command"
         },
         {
           "description": "Allow joycon_set_mapping command",
@@ -517,6 +547,30 @@
           "markdownDescription": "Denies the joycon_get_imu command without any pre-configured scope."
         },
         {
+          "description": "Enables the joycon_get_ir command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-ir",
+          "markdownDescription": "Enables the joycon_get_ir command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_ir command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-ir",
+          "markdownDescription": "Denies the joycon_get_ir command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_ir_sample command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-ir-sample",
+          "markdownDescription": "Enables the joycon_get_ir_sample command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_ir_sample command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-ir-sample",
+          "markdownDescription": "Denies the joycon_get_ir_sample command without any pre-configured scope."
+        },
+        {
           "description": "Enables the joycon_get_mappings command without any pre-configured scope.",
           "type": "string",
           "const": "allow-joycon-get-mappings",
@@ -527,6 +581,18 @@
           "type": "string",
           "const": "deny-joycon-get-mappings",
           "markdownDescription": "Denies the joycon_get_mappings command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_get_nfc_sample command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-get-nfc-sample",
+          "markdownDescription": "Enables the joycon_get_nfc_sample command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_get_nfc_sample command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-get-nfc-sample",
+          "markdownDescription": "Denies the joycon_get_nfc_sample command without any pre-configured scope."
         },
         {
           "description": "Enables the joycon_get_per_app_enabled command without any pre-configured scope.",
@@ -661,6 +727,18 @@
           "markdownDescription": "Denies the joycon_reset_mappings command without any pre-configured scope."
         },
         {
+          "description": "Enables the joycon_restart_nfc_scan command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-restart-nfc-scan",
+          "markdownDescription": "Enables the joycon_restart_nfc_scan command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_restart_nfc_scan command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-restart-nfc-scan",
+          "markdownDescription": "Denies the joycon_restart_nfc_scan command without any pre-configured scope."
+        },
+        {
           "description": "Enables the joycon_save_profile command without any pre-configured scope.",
           "type": "string",
           "const": "allow-joycon-save-profile",
@@ -695,6 +773,18 @@
           "type": "string",
           "const": "deny-joycon-set-imu",
           "markdownDescription": "Denies the joycon_set_imu command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the joycon_set_ir command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-joycon-set-ir",
+          "markdownDescription": "Enables the joycon_set_ir command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the joycon_set_ir command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-joycon-set-ir",
+          "markdownDescription": "Denies the joycon_set_ir command without any pre-configured scope."
         },
         {
           "description": "Enables the joycon_set_mapping command without any pre-configured scope.",
@@ -745,10 +835,10 @@
           "markdownDescription": "Denies the joycon_stop_capture command without any pre-configured scope."
         },
         {
-          "description": "Default permissions for the Joy-Con plugin\n#### This default permission set includes:\n\n- `allow-get-status`\n- `allow-get-mappings`\n- `allow-set-mapping`\n- `allow-reset-mappings`\n- `allow-set-enabled`\n- `allow-get-enabled`\n- `allow-list-actions`\n- `allow-start-capture`\n- `allow-stop-capture`\n- `allow-list-presets`\n- `allow-get-preset-mappings`\n- `allow-load-preset`\n- `allow-load-preset-from-url`\n- `allow-export-mappings`\n- `allow-import-mappings`\n- `allow-list-apps`\n- `allow-get-imu`\n- `allow-set-imu`\n- `allow-get-profiles`\n- `allow-save-profile`\n- `allow-delete-profile`\n- `allow-set-per-app-enabled`\n- `allow-get-per-app-enabled`\n- `allow-get-frontmost`\n- `allow-get-frontmost-app`",
+          "description": "Default permissions for the Joy-Con plugin\n#### This default permission set includes:\n\n- `allow-get-status`\n- `allow-get-mappings`\n- `allow-set-mapping`\n- `allow-reset-mappings`\n- `allow-set-enabled`\n- `allow-get-enabled`\n- `allow-list-actions`\n- `allow-start-capture`\n- `allow-stop-capture`\n- `allow-list-presets`\n- `allow-get-preset-mappings`\n- `allow-load-preset`\n- `allow-load-preset-from-url`\n- `allow-export-mappings`\n- `allow-import-mappings`\n- `allow-list-apps`\n- `allow-get-imu`\n- `allow-set-imu`\n- `allow-get-ir`\n- `allow-set-ir`\n- `allow-get-ir-sample`\n- `allow-get-nfc-sample`\n- `allow-restart-nfc-scan`\n- `allow-get-profiles`\n- `allow-save-profile`\n- `allow-delete-profile`\n- `allow-set-per-app-enabled`\n- `allow-get-per-app-enabled`\n- `allow-get-frontmost`\n- `allow-get-frontmost-app`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Default permissions for the Joy-Con plugin\n#### This default permission set includes:\n\n- `allow-get-status`\n- `allow-get-mappings`\n- `allow-set-mapping`\n- `allow-reset-mappings`\n- `allow-set-enabled`\n- `allow-get-enabled`\n- `allow-list-actions`\n- `allow-start-capture`\n- `allow-stop-capture`\n- `allow-list-presets`\n- `allow-get-preset-mappings`\n- `allow-load-preset`\n- `allow-load-preset-from-url`\n- `allow-export-mappings`\n- `allow-import-mappings`\n- `allow-list-apps`\n- `allow-get-imu`\n- `allow-set-imu`\n- `allow-get-profiles`\n- `allow-save-profile`\n- `allow-delete-profile`\n- `allow-set-per-app-enabled`\n- `allow-get-per-app-enabled`\n- `allow-get-frontmost`\n- `allow-get-frontmost-app`"
+          "markdownDescription": "Default permissions for the Joy-Con plugin\n#### This default permission set includes:\n\n- `allow-get-status`\n- `allow-get-mappings`\n- `allow-set-mapping`\n- `allow-reset-mappings`\n- `allow-set-enabled`\n- `allow-get-enabled`\n- `allow-list-actions`\n- `allow-start-capture`\n- `allow-stop-capture`\n- `allow-list-presets`\n- `allow-get-preset-mappings`\n- `allow-load-preset`\n- `allow-load-preset-from-url`\n- `allow-export-mappings`\n- `allow-import-mappings`\n- `allow-list-apps`\n- `allow-get-imu`\n- `allow-set-imu`\n- `allow-get-ir`\n- `allow-set-ir`\n- `allow-get-ir-sample`\n- `allow-get-nfc-sample`\n- `allow-restart-nfc-scan`\n- `allow-get-profiles`\n- `allow-save-profile`\n- `allow-delete-profile`\n- `allow-set-per-app-enabled`\n- `allow-get-per-app-enabled`\n- `allow-get-frontmost`\n- `allow-get-frontmost-app`"
         }
       ]
     }

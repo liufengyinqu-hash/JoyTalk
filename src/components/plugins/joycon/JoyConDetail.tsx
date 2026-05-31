@@ -23,19 +23,76 @@ interface Props {
   onLaunchWizard: () => void;
 }
 
-const KIND_TO_LAYOUT: Record<ControllerKind, SchematicLayout> = {
-  joy_con_left: "left",
-  joy_con_right: "right",
-  pro_controller: "pro",
-  unknown: "pair",
+function resolveSchematicLayout(
+  connected: { kind: ControllerKind; serial: string }[],
+): SchematicLayout {
+  if (
+    connected.some((c) => c.kind === "pro_controller") &&
+    !connected.some(
+      (c) => c.kind === "joy_con_left" || c.kind === "joy_con_right",
+    )
+  ) {
+    return "pro";
+  }
+  return "pair";
+}
+
+function formatConnectionStatus(
+  connected: { kind: ControllerKind; serial: string }[],
+): string {
+  if (connected.length === 0) {
+    return "○ 未连接 — 请在 macOS 蓝牙设置中配对";
+  }
+  const left = connected.some((c) => c.kind === "joy_con_left");
+  const right = connected.some((c) => c.kind === "joy_con_right");
+  const pro = connected.some((c) => c.kind === "pro_controller");
+  const parts: string[] = [];
+  if (left || right || connected.length === 0) {
+    parts.push(`L ${left ? "●" : "○"}`);
+    parts.push(`R ${right ? "●" : "○"}`);
+  }
+  if (pro) {
+    parts.push("Pro ●");
+  }
+  return `● ${parts.join(" · ")}`;
+}
+
+const MODE_ORDER: TriggerMode[] = [
+  "tap",
+  "double_tap",
+  "hold",
+  "long_press",
+  "repeat",
+];
+
+const MODE_SHORT: Record<TriggerMode, string> = {
+  hold: "按",
+  tap: "单",
+  double_tap: "双",
+  long_press: "长",
+  repeat: "连",
 };
 
-const CONTROLLER_NAMES: Record<ControllerKind, string> = {
-  joy_con_left: "Joy-Con (L)",
-  joy_con_right: "Joy-Con (R)",
-  pro_controller: "Pro Controller",
-  unknown: "Controller",
-};
+function buildDisplayRows(
+  mappings: ButtonMapping[],
+  drafts: ButtonMapping[],
+): ButtonMapping[] {
+  const rows: ButtonMapping[] = [...mappings, ...drafts];
+  for (const b of ALL_BUTTONS) {
+    if (!rows.some((r) => r.button === b)) {
+      rows.push({ button: b, payload: null, mode: "hold" });
+    }
+  }
+  return rows.sort((a, b) => {
+    const bi = ALL_BUTTONS.indexOf(a.button) - ALL_BUTTONS.indexOf(b.button);
+    if (bi !== 0) return bi;
+    return MODE_ORDER.indexOf(a.mode) - MODE_ORDER.indexOf(b.mode);
+  });
+}
+
+function rowKey(row: ButtonMapping): string {
+  return `${row.button}:${row.mode}`;
+}
 
 function resolveConnectedControllers(
   status: JoyConStatus,
@@ -58,7 +115,6 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
     device_count: 0,
   });
   const [activeBtns, setActiveBtns] = useState<JoyConButton[]>([]);
-  const [layout, setLayout] = useState<SchematicLayout>("pair");
   const [controllers, setControllers] = useState<
     { kind: ControllerKind; serial: string }[]
   >([]);
@@ -66,7 +122,11 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
   const [showImport, setShowImport] = useState(false);
   const [importUrl, setImportUrl] = useState("");
   const [apps, setApps] = useState<AppEntry[]>([]);
-  const [appPickerFor, setAppPickerFor] = useState<JoyConButton | null>(null);
+  const [appPickerFor, setAppPickerFor] = useState<{
+    button: JoyConButton;
+    mode: TriggerMode;
+  } | null>(null);
+  const [draftRows, setDraftRows] = useState<ButtonMapping[]>([]);
 
   const reload = async () => {
     try {
@@ -87,12 +147,7 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
       setPresets(ps);
       setApps(appList);
       const known = resolveConnectedControllers(st, []);
-      if (known.length === 1) {
-        setLayout(KIND_TO_LAYOUT[known[0].kind] ?? "pair");
-      }
-      if (known.length > 0) {
-        setControllers(known);
-      }
+      setControllers(known);
     } catch (e) {
       console.warn("[joycon] reload failed", e);
     }
@@ -106,12 +161,7 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
         if (!alive) return;
         setStatus(e.payload);
         const known = resolveConnectedControllers(e.payload, []);
-        if (known.length === 1) {
-          setLayout(KIND_TO_LAYOUT[known[0].kind] ?? "pair");
-        }
-        if (known.length > 0) {
-          setControllers(known);
-        }
+        setControllers(known);
       });
       unlisteners.push(u1);
       const u2 = await listen<{ button: JoyConButton; pressed: boolean }>(
@@ -134,7 +184,6 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
         "joycon://controller_detected",
         (e) => {
           if (!alive) return;
-          setLayout(KIND_TO_LAYOUT[e.payload.kind] ?? "pair");
           setControllers((prev) => [
             ...prev.filter((c) => c.serial !== e.payload.serial),
             { kind: e.payload.kind, serial: e.payload.serial },
@@ -164,7 +213,8 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
               : m.payload.kind === "open_app"
                 ? `→ ${m.payload.bundle_id.split(".").pop() ?? "app"}`
                 : "?";
-      acc[m.button] = name;
+      const tagged = `${MODE_SHORT[m.mode]}:${name}`;
+      acc[m.button] = acc[m.button] ? `${acc[m.button]} / ${tagged}` : tagged;
       return acc;
     },
     {},
@@ -185,8 +235,51 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
     mode: TriggerMode,
   ) => {
     const payload = actionId ? { kind: "builtin", id: actionId } : null;
-    await invoke("plugin:joycon|joycon_set_mapping", { button, payload, mode });
+    if (payload) {
+      await invoke("plugin:joycon|joycon_set_mapping", { button, payload, mode });
+      setDraftRows((prev) =>
+        prev.filter((d) => !(d.button === button && d.mode === mode)),
+      );
+    }
     await reload();
+  };
+
+  const handleModeChange = async (
+    row: ButtonMapping,
+    newMode: TriggerMode,
+  ) => {
+    if (row.mode === newMode) return;
+    if (!row.payload) {
+      setDraftRows((prev) => {
+        const withoutButton = prev.filter((d) => d.button !== row.button);
+        return [
+          ...withoutButton,
+          { button: row.button, payload: null, mode: newMode },
+        ];
+      });
+      return;
+    }
+    await invoke("plugin:joycon|joycon_set_mapping", {
+      button: row.button,
+      payload: null,
+      mode: row.mode,
+    });
+    await invoke("plugin:joycon|joycon_set_mapping", {
+      button: row.button,
+      payload: row.payload,
+      mode: newMode,
+    });
+    await reload();
+  };
+
+  const handleAddMode = (button: JoyConButton) => {
+    const used = new Set<TriggerMode>([
+      ...mappings.filter((m) => m.button === button).map((m) => m.mode),
+      ...draftRows.filter((d) => d.button === button).map((d) => d.mode),
+    ]);
+    const next = MODE_ORDER.find((m) => !used.has(m));
+    if (!next) return;
+    setDraftRows((prev) => [...prev, { button, payload: null, mode: next }]);
   };
 
   const handleReset = async () => {
@@ -219,38 +312,39 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
     }
   };
 
-  const handleSetOpenApp = async (button: JoyConButton, bundleId: string) => {
+  const handleSetOpenApp = async (
+    button: JoyConButton,
+    mode: TriggerMode,
+    bundleId: string,
+  ) => {
     const payload = { kind: "open_app", bundle_id: bundleId };
     await invoke("plugin:joycon|joycon_set_mapping", {
       button,
       payload,
-      mode: "tap",
+      mode,
     });
     setAppPickerFor(null);
     await reload();
   };
 
-  const handleClearMapping = async (button: JoyConButton) => {
+  const handleClearMapping = async (button: JoyConButton, mode: TriggerMode) => {
+    setDraftRows((prev) =>
+      prev.filter((d) => !(d.button === button && d.mode === mode)),
+    );
     await invoke("plugin:joycon|joycon_set_mapping", {
       button,
       payload: null,
-      mode: "hold",
+      mode,
     });
     await reload();
   };
 
-  const rowsByButton = new Map(mappings.map((m) => [m.button, m]));
-  const rows = ALL_BUTTONS.map(
-    (b) =>
-      rowsByButton.get(b) ?? {
-        button: b,
-        payload: null,
-        mode: "hold" as TriggerMode,
-      },
-  );
+  const rows = buildDisplayRows(mappings, draftRows);
+  const firstRowForButton = new Set<JoyConButton>();
 
   const connected = resolveConnectedControllers(status, controllers);
-  const connectedKinds = status.connected ? connected.map((c) => c.kind) : [];
+  const connectedKinds = connected.map((c) => c.kind);
+  const schematicLayout = resolveSchematicLayout(connected);
 
   return (
     <div className="space-y-4">
@@ -258,15 +352,10 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
         <div>
           <h1 className="text-xl font-bold">Joy-Con Controller</h1>
           <p className="text-sm text-text-secondary">
-            {status.connected
-              ? `● ${
-                  connected.length > 0
-                    ? connected
-                        .map((c) => CONTROLLER_NAMES[c.kind] ?? "Controller")
-                        .join(" + ")
-                    : `${status.device_count} Joy-Con`
-                } · ${status.battery}%${status.charging ? " ⚡" : ""}`
-              : "○ Not connected — pair via macOS Bluetooth settings"}
+            {formatConnectionStatus(connected)}
+            {status.connected && status.battery > 0
+              ? ` · ${status.battery}%${status.charging ? " ⚡" : ""}`
+              : ""}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -289,7 +378,7 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
 
       <div className="surface-card p-4 flex justify-center">
         <Schematic
-          layout={layout}
+          layout={schematicLayout}
           highlight={highlight}
           active={activeBtns}
           labels={labels}
@@ -352,10 +441,11 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
           >
             Reset
           </button>
-        </div>        <table className="w-full text-sm">
+        </div>
+        <table className="w-full text-sm">
           <thead className="bg-surface-2">
             <tr>
-              <th className="text-left px-3 py-2 font-medium w-24">Button</th>
+              <th className="text-left px-3 py-2 font-medium w-28">Button</th>
               <th className="text-left px-3 py-2 font-medium">Action</th>
               <th className="text-left px-3 py-2 font-medium w-32">Mode</th>
             </tr>
@@ -364,10 +454,51 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
             {rows.map((row) => {
               const builtinId =
                 row.payload?.kind === "builtin" ? row.payload.id : "";
+              const showButtonLabel = !firstRowForButton.has(row.button);
+              if (showButtonLabel) {
+                firstRowForButton.add(row.button);
+              }
+              const usedModes = new Set(
+                rows
+                  .filter((r) => r.button === row.button && r.mode !== row.mode)
+                  .map((r) => r.mode),
+              );
+              const modesForButton = new Set([
+                ...mappings
+                  .filter((m) => m.button === row.button)
+                  .map((m) => m.mode),
+                ...draftRows
+                  .filter((d) => d.button === row.button)
+                  .map((d) => d.mode),
+              ]);
+              if (!row.payload) {
+                modesForButton.add(row.mode);
+              }
+              const allModesUsed = MODE_ORDER.every((m) =>
+                modesForButton.has(m),
+              );
+
               return (
-                <tr key={row.button} className="border-t border-border">
+                <tr key={rowKey(row)} className="border-t border-border">
                   <td className="px-3 py-2 font-mono text-xs">
-                    {BUTTON_LABELS[row.button]}
+                    {showButtonLabel ? (
+                      <div className="flex items-center gap-1">
+                        <span>{BUTTON_LABELS[row.button]}</span>
+                        {!allModesUsed && (
+                          <button
+                            type="button"
+                            className="text-[10px] px-1 rounded border border-border hover:border-accent text-text-secondary hover:text-accent"
+                            title="添加触发方式"
+                            onClick={() => handleAddMode(row.button)}
+                            disabled={!enabled}
+                          >
+                            +
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-text-secondary">↳</span>
+                    )}
                   </td>
                   <td className="px-3 py-2">
                     <select
@@ -402,7 +533,9 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
                     )}
                     <button
                       className="text-xs ml-2 px-1.5 py-0.5 rounded border border-border hover:border-accent"
-                      onClick={() => setAppPickerFor(row.button)}
+                      onClick={() =>
+                        setAppPickerFor({ button: row.button, mode: row.mode })
+                      }
                       disabled={!enabled}
                     >
                       App…
@@ -410,7 +543,9 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
                     {row.payload && (
                       <button
                         className="text-xs ml-1 px-1.5 py-0.5 rounded border border-border hover:border-danger hover:text-danger"
-                        onClick={() => handleClearMapping(row.button)}
+                        onClick={() =>
+                          handleClearMapping(row.button, row.mode)
+                        }
                       >
                         ✕
                       </button>
@@ -421,16 +556,16 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
                       className="bg-surface-2 border border-border rounded px-2 py-1 text-xs"
                       value={row.mode}
                       onChange={(e) =>
-                        handleSetAction(
-                          row.button,
-                          builtinId || null,
-                          e.target.value as TriggerMode,
-                        )
+                        handleModeChange(row, e.target.value as TriggerMode)
                       }
-                      disabled={!enabled || !row.payload}
+                      disabled={!enabled}
                     >
                       {(Object.keys(MODE_LABELS) as TriggerMode[]).map((m) => (
-                        <option key={m} value={m}>
+                        <option
+                          key={m}
+                          value={m}
+                          disabled={usedModes.has(m)}
+                        >
                           {MODE_LABELS[m]}
                         </option>
                       ))}
@@ -454,7 +589,8 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
           >
             <div className="px-4 py-3 border-b border-border flex items-center justify-between">
               <h3 className="text-sm font-semibold">
-                Choose app for {BUTTON_LABELS[appPickerFor]}
+                Choose app for {BUTTON_LABELS[appPickerFor.button]} (
+                {MODE_LABELS[appPickerFor.mode]})
               </h3>
               <button
                 className="text-xs text-text-secondary hover:text-text"
@@ -475,7 +611,8 @@ export const JoyConDetail: React.FC<Props> = ({ onLaunchWizard }) => {
                     className="w-full text-left px-4 py-2 hover:bg-accent/10 border-b border-border"
                     onClick={() =>
                       handleSetOpenApp(
-                        appPickerFor,
+                        appPickerFor.button,
+                        appPickerFor.mode,
                         a.bundle_id || a.name,
                       )
                     }

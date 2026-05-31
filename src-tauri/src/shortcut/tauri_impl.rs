@@ -3,7 +3,7 @@
 //! This module provides shortcut functionality using Tauri's built-in
 //! global-shortcut plugin.
 
-use log::{error, warn};
+use log::{debug, error, warn};
 use tauri::AppHandle;
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
@@ -168,6 +168,16 @@ pub fn register_cancel_shortcut(app: &AppHandle) {
         let app_clone = app.clone();
         tauri::async_runtime::spawn(async move {
             if let Some(cancel_binding) = get_settings(&app_clone).bindings.get("cancel").cloned() {
+                if super::handy_keys::hotkey_owned_by_static_binding(
+                    &app_clone,
+                    &cancel_binding.current_binding,
+                ) {
+                    debug!(
+                        "Cancel hotkey '{}' already registered via transcribe/other binding; skipping duplicate register",
+                        cancel_binding.current_binding
+                    );
+                    return;
+                }
                 if let Err(e) = register_shortcut(&app_clone, cancel_binding) {
                     error!("Failed to register cancel shortcut: {}", e);
                 }

@@ -117,12 +117,14 @@ export const JoyConWizard: React.FC<Props> = ({ onDone, onCancel }) => {
   };
 
   const save = async (mappings: ButtonMapping[]) => {
-    // clear existing, then apply
-    for (const b of ALL_BUTTONS) {
+    const current = await invoke<ButtonMapping[]>(
+      "plugin:joycon|joycon_get_mappings",
+    );
+    for (const m of current) {
       await invoke("plugin:joycon|joycon_set_mapping", {
-        button: b,
+        button: m.button,
         payload: null,
-        mode: "hold",
+        mode: m.mode,
       });
     }
     for (const m of mappings) {

@@ -22,6 +22,11 @@ Default permissions for the Joy-Con plugin
 - `allow-list-apps`
 - `allow-get-imu`
 - `allow-set-imu`
+- `allow-get-ir`
+- `allow-set-ir`
+- `allow-get-ir-sample`
+- `allow-get-nfc-sample`
+- `allow-restart-nfc-scan`
 - `allow-get-profiles`
 - `allow-save-profile`
 - `allow-delete-profile`
@@ -120,12 +125,51 @@ Allow joycon_get_imu command
 <tr>
 <td>
 
+`joycon:allow-get-ir-sample`
+
+</td>
+<td>
+
+Allow joycon_get_ir_sample command
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:allow-get-ir`
+
+</td>
+<td>
+
+Allow joycon_get_ir command
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `joycon:allow-get-mappings`
 
 </td>
 <td>
 
 Allow joycon_get_mappings command
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:allow-get-nfc-sample`
+
+</td>
+<td>
+
+Allow joycon_get_nfc_sample command
 
 </td>
 </tr>
@@ -276,6 +320,19 @@ Allow joycon_reset_mappings command
 <tr>
 <td>
 
+`joycon:allow-restart-nfc-scan`
+
+</td>
+<td>
+
+Allow joycon_restart_nfc_scan command
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `joycon:allow-save-profile`
 
 </td>
@@ -308,6 +365,19 @@ Allow joycon_set_enabled command
 <td>
 
 Allow joycon_set_imu command
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:allow-set-ir`
+
+</td>
+<td>
+
+Allow joycon_set_ir command
 
 </td>
 </tr>
@@ -523,6 +593,58 @@ Denies the joycon_get_imu command without any pre-configured scope.
 <tr>
 <td>
 
+`joycon:allow-joycon-get-ir`
+
+</td>
+<td>
+
+Enables the joycon_get_ir command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:deny-joycon-get-ir`
+
+</td>
+<td>
+
+Denies the joycon_get_ir command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:allow-joycon-get-ir-sample`
+
+</td>
+<td>
+
+Enables the joycon_get_ir_sample command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:deny-joycon-get-ir-sample`
+
+</td>
+<td>
+
+Denies the joycon_get_ir_sample command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `joycon:allow-joycon-get-mappings`
 
 </td>
@@ -542,6 +664,32 @@ Enables the joycon_get_mappings command without any pre-configured scope.
 <td>
 
 Denies the joycon_get_mappings command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:allow-joycon-get-nfc-sample`
+
+</td>
+<td>
+
+Enables the joycon_get_nfc_sample command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:deny-joycon-get-nfc-sample`
+
+</td>
+<td>
+
+Denies the joycon_get_nfc_sample command without any pre-configured scope.
 
 </td>
 </tr>
@@ -835,6 +983,32 @@ Denies the joycon_reset_mappings command without any pre-configured scope.
 <tr>
 <td>
 
+`joycon:allow-joycon-restart-nfc-scan`
+
+</td>
+<td>
+
+Enables the joycon_restart_nfc_scan command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:deny-joycon-restart-nfc-scan`
+
+</td>
+<td>
+
+Denies the joycon_restart_nfc_scan command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `joycon:allow-joycon-save-profile`
 
 </td>
@@ -906,6 +1080,32 @@ Enables the joycon_set_imu command without any pre-configured scope.
 <td>
 
 Denies the joycon_set_imu command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:allow-joycon-set-ir`
+
+</td>
+<td>
+
+Enables the joycon_set_ir command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`joycon:deny-joycon-set-ir`
+
+</td>
+<td>
+
+Denies the joycon_set_ir command without any pre-configured scope.
 
 </td>
 </tr>

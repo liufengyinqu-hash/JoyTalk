@@ -11,9 +11,10 @@ mod types;
 
 pub use actions::{ActionContext, ActionRegistry};
 pub use types::{
-    default_mappings, ActionPayload, AppProfile, ButtonMapping, ControllerDetected,
-    ControllerKind, ImuConfig, JoyConActionFired, JoyConButton, JoyConButtonEvent, JoyConSide,
-    JoyConStatus, KeyChord, Modifier, Preset, PresetMapping, PresetSummary, TriggerMode,
+    default_mappings, ActionPayload, AppProfile, ButtonMapping, ControllerDetected, ControllerKind,
+    ImuConfig, IrLiveSample, JoyConActionFired, JoyConButton, JoyConButtonEvent, JoyConSide,
+    JoyConStatus, McuConfig, McuStatus, NfcLiveSample, KeyChord, Modifier, Preset, PresetMapping,
+    PresetSummary, TriggerMode,
 };
 
 use std::sync::Arc;
@@ -65,6 +66,11 @@ impl<R: Runtime> Builder<R> {
                 commands::joycon_list_apps,
                 commands::joycon_get_imu,
                 commands::joycon_set_imu,
+                commands::joycon_get_ir,
+                commands::joycon_set_ir,
+                commands::joycon_get_ir_sample,
+                commands::joycon_get_nfc_sample,
+                commands::joycon_restart_nfc_scan,
                 commands::joycon_get_profiles,
                 commands::joycon_save_profile,
                 commands::joycon_delete_profile,
@@ -81,6 +87,7 @@ impl<R: Runtime> Builder<R> {
                     cfg.mappings,
                     cfg.seen_serials,
                     cfg.imu,
+                    cfg.mcu,
                     cfg.profiles,
                     cfg.per_app_enabled,
                 );

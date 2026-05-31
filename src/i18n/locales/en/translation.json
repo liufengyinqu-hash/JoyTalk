@@ -641,6 +641,82 @@
         "hint": "Press a Joy-Con button to capture"
       },
       "disconnected": "○ Not connected — pair via macOS Bluetooth settings"
+    },
+    "irTuner": {
+      "title": "IR / NFC (Right Joy-Con)",
+      "subtitle": "IR and NFC share the same MCU — only one at a time. Hot-switch supported.",
+      "back": "← Back",
+      "openButton": "IR / NFC",
+      "imuLink": "IMU Tuning",
+      "mode": {
+        "label": "Sensor mode",
+        "off": "Off",
+        "ir": "IR proximity",
+        "nfc": "NFC reader",
+        "hint": "Changes apply immediately without reconnecting (right Joy-Con required).",
+        "activeLabel": "Running:",
+        "switching": "Switching…",
+        "pending": "Starting MCU…",
+        "pendingNoJoyCon": "Waiting for right Joy-Con"
+      },
+      "enabled": {
+        "label": "Enable MCU",
+        "hint": "When off, the right Joy-Con IR/NFC sensor stays inactive."
+      },
+      "status": {
+        "config": "Configured",
+        "runtime": "Running",
+        "session": "Data stream"
+      },
+      "threshold": {
+        "label": "Sensitivity (white pixel count)",
+        "hint": "Lower = more sensitive. Default 50."
+      },
+      "mappingHint": "Assign mappings to this virtual button in the schematic:",
+      "reset": "Reset to Defaults",
+      "done": "Done",
+      "live": {
+        "title": "Live IR data",
+        "sessionActive": "Streaming",
+        "sessionInactive": "Waiting for right Joy-Con",
+        "proximityOn": "Proximity detected",
+        "proximityOff": "No proximity",
+        "intensity": "Average intensity",
+        "whitePixels": "White pixel count",
+        "ambient": "Ambient noise",
+        "threshold": "Trigger threshold",
+        "barLabel": "White pixels vs threshold",
+        "history": "White pixel history (~10 Hz)",
+        "hint": "Wave your hand near the IR sensor below the Home button. Reconnect after toggling IR."
+      },
+      "nfcLive": {
+        "title": "Live NFC data",
+        "sensingZone": "Sensing zone (current)",
+        "tagOn": "Tag detected",
+        "tagOff": "Waiting for tag",
+        "readyToScan": "Ready for new tag",
+        "scanning": "Reading tag…",
+        "resetting": "Zone cleared — waiting to be ready…",
+        "waitingSession": "Waiting for NFC session…",
+        "currentUid": "Current UID",
+        "uid": "UID (hex)",
+        "uidLen": "UID length",
+        "tagType": "Tag type",
+        "state": "State code",
+        "statePolling": "Polling",
+        "stateScanning": "Scanning",
+        "stateTagPresent": "Tag present",
+        "stateIdle": "Idle",
+        "stateUnknown": "Unknown ({{code}})",
+        "copy": "Copy UID",
+        "copied": "Copied",
+        "lastUpdate": "Last update",
+        "senseHistory": "Sense history",
+        "uidHistory": "Recent UIDs",
+        "rescan": "Rescan",
+        "hint": "Hold your NFC card against the right Joy-Con R stick. Lifting the card clears the sensing zone above; history below is kept. Wait for Ready for new tag and Polling before trying another card; tap Rescan if it stays stuck."
+      },
+      "nfcMappingHint": "Assign mappings to this virtual button in the schematic:"
     }
   }
 }

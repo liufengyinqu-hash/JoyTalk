@@ -175,7 +175,7 @@ export const JoyConBindings: React.FC = () => {
         await invoke("plugin:joycon|joycon_set_mapping", {
           button: existing.button,
           payload: null,
-          mode: "hold",
+          mode: existing.mode,
         });
       }
     }
@@ -217,9 +217,17 @@ export const JoyConBindings: React.FC = () => {
       if (m.mode !== desired) {
         invoke("plugin:joycon|joycon_set_mapping", {
           button: m.button,
-          payload: m.payload,
-          mode: desired,
-        }).then(reload);
+          payload: null,
+          mode: m.mode,
+        })
+          .then(() =>
+            invoke("plugin:joycon|joycon_set_mapping", {
+              button: m.button,
+              payload: m.payload,
+              mode: desired,
+            }),
+          )
+          .then(reload);
       }
     }
     if (pttEnabled) {
@@ -238,7 +246,7 @@ export const JoyConBindings: React.FC = () => {
           invoke("plugin:joycon|joycon_set_mapping", {
             button: cancelMap.button,
             payload: null,
-            mode: "hold",
+            mode: cancelMap.mode,
           }).then(reload);
         }
       }
@@ -326,7 +334,7 @@ export const JoyConBindings: React.FC = () => {
           await invoke("plugin:joycon|joycon_set_mapping", {
             button: m.button,
             payload: null,
-            mode: "hold",
+            mode: m.mode,
           });
           await reload();
         }}

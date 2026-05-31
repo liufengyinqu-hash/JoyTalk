@@ -5,13 +5,15 @@ use std::collections::HashSet;
 use tauri::{AppHandle, Runtime};
 use tauri_plugin_store::StoreExt;
 
-use crate::types::{default_mappings, AppProfile, ButtonMapping, ImuConfig};
+use crate::types::{default_mappings, AppProfile, ButtonMapping, ImuConfig, McuConfig, McuMode};
 
 const STORE_PATH: &str = ".joycon-plugin.dat";
 const KEY: &str = "joycon";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PluginConfig {
+    #[serde(default = "default_missing_config_version")]
+    pub config_version: u32,
     #[serde(default = "default_enabled")]
     pub enabled: bool,
     #[serde(default = "default_mappings")]
@@ -20,6 +22,8 @@ pub struct PluginConfig {
     pub seen_serials: HashSet<String>,
     #[serde(default)]
     pub imu: ImuConfig,
+    #[serde(default, alias = "ir")]
+    pub mcu: McuConfig,
     #[serde(default)]
     pub profiles: Vec<AppProfile>,
     #[serde(default = "default_per_app_enabled")]
@@ -30,6 +34,18 @@ fn default_enabled() -> bool {
     true
 }
 
+fn default_config_version() -> u32 {
+    2
+}
+
+fn default_missing_config_version() -> u32 {
+    0
+}
+
+pub fn current_config_version() -> u32 {
+    2
+}
+
 fn default_per_app_enabled() -> bool {
     false
 }
@@ -37,10 +53,12 @@ fn default_per_app_enabled() -> bool {
 impl Default for PluginConfig {
     fn default() -> Self {
         Self {
+            config_version: default_config_version(),
             enabled: true,
             mappings: default_mappings(),
             seen_serials: HashSet::new(),
             imu: ImuConfig::default(),
+            mcu: McuConfig::default(),
             profiles: Vec::new(),
             per_app_enabled: false,
         }
@@ -52,13 +70,28 @@ pub fn load<R: Runtime>(app: &AppHandle<R>) -> PluginConfig {
         return PluginConfig::default();
     };
     if let Some(v) = store.get(KEY) {
-        if let Ok(cfg) = serde_json::from_value::<PluginConfig>(v) {
+        if let Ok(mut cfg) = serde_json::from_value::<PluginConfig>(v) {
+            if migrate_config(&mut cfg) {
+                store.set(KEY, serde_json::to_value(&cfg).unwrap_or_default());
+            }
             return cfg;
         }
     }
     let cfg = PluginConfig::default();
     store.set(KEY, serde_json::to_value(&cfg).unwrap_or_default());
     cfg
+}
+
+fn migrate_config(cfg: &mut PluginConfig) -> bool {
+    let mut changed = false;
+    if cfg.config_version < 2 {
+        if cfg.mcu.mode == McuMode::Off {
+            cfg.mcu.mode = McuMode::Nfc;
+        }
+        cfg.config_version = 2;
+        changed = true;
+    }
+    changed
 }
 
 pub fn save<R: Runtime>(app: &AppHandle<R>, cfg: &PluginConfig) -> Result<(), String> {

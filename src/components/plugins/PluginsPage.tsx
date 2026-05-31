@@ -7,6 +7,7 @@ import { JoyConWizard } from "./joycon/Wizard";
 import { MacroRecorder } from "./joycon/MacroRecorder";
 import { ScriptRecorder } from "./joycon/ScriptRecorder";
 import { ImuTuner } from "./joycon/ImuTuner";
+import { IrTuner } from "./joycon/IrTuner";
 import { ProfilesManager } from "./joycon/ProfilesManager";
 
 type View =
@@ -16,6 +17,7 @@ type View =
   | { kind: "macro" }
   | { kind: "script" }
   | { kind: "imu" }
+  | { kind: "ir" }
   | { kind: "profiles" };
 
 export const PluginsPage: React.FC = () => {
@@ -44,6 +46,10 @@ export const PluginsPage: React.FC = () => {
 
   if (view.kind === "imu") {
     return <ImuTuner onClose={() => setView({ kind: "detail", pluginId: "joycon" })} />;
+  }
+
+  if (view.kind === "ir") {
+    return <IrTuner onClose={() => setView({ kind: "detail", pluginId: "joycon" })} />;
   }
 
   if (view.kind === "profiles") {
@@ -81,7 +87,13 @@ export const PluginsPage: React.FC = () => {
             className="text-xs px-2 py-1 rounded-md border border-border hover:border-accent"
             onClick={() => setView({ kind: "imu" })}
           >
-            IMU Tuning
+            {t("joycon.irTuner.imuLink", "IMU Tuning")}
+          </button>
+          <button
+            className="text-xs px-2 py-1 rounded-md border border-border hover:border-accent"
+            onClick={() => setView({ kind: "ir" })}
+          >
+            {t("joycon.irTuner.openButton")}
           </button>
           <button
             className="text-xs px-2 py-1 rounded-md border border-border hover:border-accent"

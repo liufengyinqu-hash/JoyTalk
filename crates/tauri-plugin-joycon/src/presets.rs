@@ -12,7 +12,14 @@ const BLANK: &str = include_str!("../presets/blank.json");
 const TWO_BUTTON: &str = include_str!("../presets/two-button-transcribe.json");
 
 pub fn builtin_presets() -> Vec<Preset> {
-    let raw = [VIBE_CODING, TWO_BUTTON, VIDEO_EDITING, MEETING_MUTE, DEFAULT, BLANK];
+    let raw = [
+        VIBE_CODING,
+        TWO_BUTTON,
+        VIDEO_EDITING,
+        MEETING_MUTE,
+        DEFAULT,
+        BLANK,
+    ];
     raw.iter()
         .filter_map(|s| serde_json::from_str::<Preset>(s).ok())
         .collect()

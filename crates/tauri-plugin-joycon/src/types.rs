@@ -46,6 +46,10 @@ pub enum JoyConButton {
     TiltRight,
     ShakeHorizontal,
     ShakeVertical,
+    /// IR camera proximity (right Joy-Con, `mcu.mode = ir`).
+    IrProximity,
+    /// NFC tag present (right Joy-Con, `mcu.mode = nfc`).
+    NfcTagPresent,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type)]
@@ -192,10 +196,133 @@ impl Default for ImuConfig {
     }
 }
 
-fn default_shake_threshold() -> i32 { 28000 }
-fn default_flip_threshold() -> i32 { 18000 }
-fn default_gesture_cooldown_ms() -> u32 { 400 }
-fn default_gesture_hold_ms() -> u32 { 180 }
+fn default_shake_threshold() -> i32 {
+    28000
+}
+fn default_flip_threshold() -> i32 {
+    18000
+}
+fn default_gesture_cooldown_ms() -> u32 {
+    400
+}
+fn default_gesture_hold_ms() -> u32 {
+    180
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type)]
+#[serde(rename_all = "snake_case")]
+pub enum McuMode {
+    Off,
+    Ir,
+    Nfc,
+}
+
+impl Default for McuMode {
+    fn default() -> Self {
+        McuMode::Off
+    }
+}
+
+#[derive(Serialize, Debug, Clone, Type)]
+pub struct McuConfig {
+    /// Right Joy-Con MCU mode: IR proximity, NFC tag detect, or off.
+    #[serde(default)]
+    pub mode: McuMode,
+    /// IR only: `white_pixel_count` above this triggers `IrProximity`.
+    #[serde(default = "default_ir_white_pixel_threshold")]
+    pub white_pixel_threshold: u16,
+}
+
+impl Default for McuConfig {
+    fn default() -> Self {
+        Self {
+            mode: McuMode::Off,
+            white_pixel_threshold: default_ir_white_pixel_threshold(),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for McuConfig {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct Helper {
+            #[serde(default)]
+            mode: Option<McuMode>,
+            #[serde(default)]
+            enabled: Option<bool>,
+            #[serde(default = "default_ir_white_pixel_threshold")]
+            white_pixel_threshold: u16,
+        }
+        let h = Helper::deserialize(deserializer)?;
+        let mode = h.mode.unwrap_or_else(|| {
+            if h.enabled == Some(false) {
+                McuMode::Off
+            } else {
+                McuMode::Off
+            }
+        });
+        Ok(McuConfig {
+            mode,
+            white_pixel_threshold: h.white_pixel_threshold,
+        })
+    }
+}
+
+/// Latest IR PulseRate sample from the right Joy-Con (for UI / debug).
+#[derive(Serialize, Deserialize, Debug, Clone, Default, Type)]
+pub struct IrLiveSample {
+    /// IR MCU stream is active on a connected right Joy-Con.
+    pub session_active: bool,
+    pub average_intensity: u8,
+    pub white_pixel_count: u16,
+    pub ambient_noise_count: u16,
+    pub proximity_active: bool,
+}
+
+/// Latest NFC sample from the right Joy-Con (for UI / debug).
+#[derive(Serialize, Deserialize, Debug, Clone, Default, Type)]
+pub struct NfcLiveSample {
+    pub session_active: bool,
+    pub tag_present: bool,
+    /// MCU reports tag info in the field but UID read is not finalized.
+    pub tag_detected: bool,
+    pub uid: String,
+    pub uid_len: u8,
+    pub tag_type: u8,
+    pub nfc_state: u8,
+}
+
+/// Right Joy-Con MCU runtime (may differ from saved config during hot-switch).
+#[derive(Serialize, Debug, Clone, Copy, Default, Type)]
+pub struct McuRuntime {
+    pub active_mode: McuMode,
+    pub switching: bool,
+}
+
+/// Saved MCU config + live runtime for the settings UI.
+#[derive(Serialize, Debug, Clone, Type)]
+pub struct McuStatus {
+    pub config: McuConfig,
+    pub active_mode: McuMode,
+    pub switching: bool,
+}
+
+impl McuStatus {
+    pub fn from_parts(config: McuConfig, runtime: McuRuntime) -> Self {
+        Self {
+            config,
+            active_mode: runtime.active_mode,
+            switching: runtime.switching,
+        }
+    }
+}
+
+fn default_ir_white_pixel_threshold() -> u16 {
+    50
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone, Type)]
 pub struct AppProfile {
@@ -249,4 +376,46 @@ pub fn default_mappings() -> Vec<ButtonMapping> {
             mode: TriggerMode::Hold,
         },
     ]
+}
+
+#[cfg(test)]
+mod mcu_config_tests {
+    use super::*;
+
+    #[test]
+    fn default_mode_is_off() {
+        assert_eq!(McuConfig::default().mode, McuMode::Off);
+    }
+
+    #[test]
+    fn deserializes_nfc_mode() {
+        let cfg: McuConfig =
+            serde_json::from_str(r#"{"mode":"nfc","white_pixel_threshold":50}"#).unwrap();
+        assert_eq!(cfg.mode, McuMode::Nfc);
+        assert_eq!(cfg.white_pixel_threshold, 50);
+    }
+
+    #[test]
+    fn deserializes_off_via_legacy_enabled_flag() {
+        let cfg: McuConfig =
+            serde_json::from_str(r#"{"enabled":false,"white_pixel_threshold":40}"#).unwrap();
+        assert_eq!(cfg.mode, McuMode::Off);
+        assert_eq!(cfg.white_pixel_threshold, 40);
+    }
+
+    #[test]
+    fn status_snapshot_reflects_nfc_config() {
+        let status = McuStatus::from_parts(
+            McuConfig {
+                mode: McuMode::Nfc,
+                white_pixel_threshold: 50,
+            },
+            McuRuntime {
+                active_mode: McuMode::Nfc,
+                switching: false,
+            },
+        );
+        assert_eq!(status.config.mode, McuMode::Nfc);
+        assert_eq!(status.active_mode, McuMode::Nfc);
+    }
 }

@@ -9,9 +9,8 @@ use crate::types::{KeyChord, Modifier};
 
 // Global enigo instance — Enigo::new() takes ~5-15ms on macOS,
 // caching avoids that overhead per keystroke.
-static ENIGO: Lazy<Mutex<Option<Enigo>>> = Lazy::new(|| {
-    Mutex::new(Enigo::new(&Settings::default()).ok())
-});
+static ENIGO: Lazy<Mutex<Option<Enigo>>> =
+    Lazy::new(|| Mutex::new(Enigo::new(&Settings::default()).ok()));
 
 fn with_enigo<F: FnOnce(&mut Enigo)>(f: F) {
     let mut guard = match ENIGO.lock() {
@@ -123,7 +122,8 @@ fn press_chord(eg: &mut Enigo, chord: &KeyChord) -> Result<(), String> {
         eg.key(k, Direction::Click).map_err(|e| format!("{e:?}"))?;
     }
     for k in mod_keys.iter().rev() {
-        eg.key(*k, Direction::Release).map_err(|e| format!("{e:?}"))?;
+        eg.key(*k, Direction::Release)
+            .map_err(|e| format!("{e:?}"))?;
     }
     Ok(())
 }

@@ -8,8 +8,8 @@ use crate::presets::{builtin_summaries, find_builtin, validate};
 use crate::settings::{save, PluginConfig};
 use crate::state::State;
 use crate::types::{
-    ActionPayload, AppProfile, ButtonMapping, ImuConfig, JoyConButton, JoyConStatus, Preset,
-    PresetMapping, PresetSummary, TriggerMode,
+    ActionPayload, AppProfile, ButtonMapping, ImuConfig, IrLiveSample, JoyConButton, McuConfig,
+    McuStatus, NfcLiveSample, JoyConStatus, Preset, PresetMapping, PresetSummary, TriggerMode,
 };
 
 #[tauri::command]
@@ -21,11 +21,7 @@ pub fn joycon_get_status(state: TState<'_, State>) -> JoyConStatus {
 #[tauri::command]
 #[specta::specta]
 pub fn joycon_get_mappings(state: TState<'_, State>) -> Vec<ButtonMapping> {
-    state
-        .mappings
-        .lock()
-        .map(|g| g.clone())
-        .unwrap_or_default()
+    state.mappings.lock().map(|g| g.clone()).unwrap_or_default()
 }
 
 #[tauri::command]
@@ -39,9 +35,13 @@ pub fn joycon_set_mapping<R: Runtime>(
 ) -> Result<(), String> {
     {
         let mut guard = state.mappings.lock().map_err(|_| "lock poisoned")?;
-        if let Some(m) = guard.iter_mut().find(|m| m.button == button) {
+        if payload.is_none() {
+            guard.retain(|m| !(m.button == button && m.mode == mode));
+        } else if let Some(m) = guard
+            .iter_mut()
+            .find(|m| m.button == button && m.mode == mode)
+        {
             m.payload = payload.clone();
-            m.mode = mode;
         } else {
             guard.push(ButtonMapping {
                 button,
@@ -158,11 +158,7 @@ pub fn joycon_load_preset_from_url<R: Runtime>(
 #[tauri::command]
 #[specta::specta]
 pub fn joycon_export_mappings(state: TState<'_, State>) -> Result<String, String> {
-    let mappings = state
-        .mappings
-        .lock()
-        .map(|g| g.clone())
-        .unwrap_or_default();
+    let mappings = state.mappings.lock().map(|g| g.clone()).unwrap_or_default();
     let preset = Preset {
         id: "custom-export".into(),
         name: "Custom Export".into(),
@@ -218,23 +214,17 @@ fn apply_preset<R: Runtime>(
 
 fn persist<R: Runtime>(app: &AppHandle<R>, state: &State) -> Result<(), String> {
     let cfg = PluginConfig {
+        config_version: crate::settings::current_config_version(),
         enabled: state.enabled.load(Ordering::Relaxed),
-        mappings: state
-            .mappings
-            .lock()
-            .map(|g| g.clone())
-            .unwrap_or_default(),
+        mappings: state.mappings.lock().map(|g| g.clone()).unwrap_or_default(),
         seen_serials: state
             .seen_serials
             .lock()
             .map(|s| s.clone())
             .unwrap_or_default(),
         imu: state.imu.lock().map(|g| g.clone()).unwrap_or_default(),
-        profiles: state
-            .profiles
-            .lock()
-            .map(|g| g.clone())
-            .unwrap_or_default(),
+        mcu: state.mcu.lock().map(|g| g.clone()).unwrap_or_default(),
+        profiles: state.profiles.lock().map(|g| g.clone()).unwrap_or_default(),
         per_app_enabled: state.per_app_enabled.load(Ordering::Relaxed),
     };
     save(app, &cfg)
@@ -257,6 +247,43 @@ pub fn joycon_set_imu<R: Runtime>(
         *g = imu;
     }
     persist(&app, &state)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn joycon_get_ir(state: TState<'_, State>) -> McuStatus {
+    state.mcu_status_snapshot()
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn joycon_set_ir<R: Runtime>(
+    app: AppHandle<R>,
+    state: TState<'_, State>,
+    ir: McuConfig,
+) -> Result<(), String> {
+    if let Ok(mut g) = state.mcu.lock() {
+        *g = ir;
+    }
+    persist(&app, &state)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn joycon_get_ir_sample(state: TState<'_, State>) -> IrLiveSample {
+    state.ir_sample.lock().map(|g| g.clone()).unwrap_or_default()
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn joycon_get_nfc_sample(state: TState<'_, State>) -> NfcLiveSample {
+    state.nfc_sample.lock().map(|g| g.clone()).unwrap_or_default()
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn joycon_restart_nfc_scan(state: TState<'_, State>) {
+    state.nfc_rescan.store(true, Ordering::Relaxed);
 }
 
 #[tauri::command]
@@ -322,11 +349,7 @@ pub fn joycon_get_per_app_enabled(state: TState<'_, State>) -> bool {
 #[tauri::command]
 #[specta::specta]
 pub fn joycon_get_frontmost(state: TState<'_, State>) -> Option<String> {
-    state
-        .frontmost_bundle
-        .lock()
-        .ok()
-        .and_then(|g| g.clone())
+    state.frontmost_bundle.lock().ok().and_then(|g| g.clone())
 }
 
 #[derive(serde::Serialize, specta::Type)]
@@ -338,10 +361,7 @@ pub struct FrontmostApp {
 #[tauri::command]
 #[specta::specta]
 pub fn joycon_get_frontmost_app() -> Option<FrontmostApp> {
-    crate::listener::read_frontmost_app().map(|(name, bundle_id)| FrontmostApp {
-        name,
-        bundle_id,
-    })
+    crate::listener::read_frontmost_app().map(|(name, bundle_id)| FrontmostApp { name, bundle_id })
 }
 
 pub fn provide_state<R: Runtime>(
@@ -380,7 +400,9 @@ fn list_macos_apps() -> Vec<AppEntry> {
     let mut out = Vec::new();
     for dir in ["/Applications", "/System/Applications"] {
         let p = Path::new(dir);
-        let Ok(entries) = fs::read_dir(p) else { continue };
+        let Ok(entries) = fs::read_dir(p) else {
+            continue;
+        };
         for e in entries.flatten() {
             let path = e.path();
             if path.extension().and_then(|s| s.to_str()) != Some("app") {

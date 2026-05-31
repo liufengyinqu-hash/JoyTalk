@@ -641,6 +641,82 @@
         "hint": "按 Joy-Con 任意键自动捕获"
       },
       "disconnected": "○ 未连接 — 请在 macOS 蓝牙设置中配对"
+    },
+    "irTuner": {
+      "title": "IR / NFC（右 Joy-Con）",
+      "subtitle": "IR 与 NFC 共用同一 MCU，只能二选一。支持热切换。",
+      "back": "← 返回",
+      "openButton": "IR / NFC",
+      "imuLink": "IMU 手势",
+      "mode": {
+        "label": "传感器模式",
+        "off": "关闭",
+        "ir": "IR 接近",
+        "nfc": "NFC 读卡",
+        "hint": "切换后立即生效，无需重连手柄（需已连接右 Joy-Con）。",
+        "activeLabel": "当前运行：",
+        "switching": "切换中…",
+        "pending": "正在启动 MCU…",
+        "pendingNoJoyCon": "等待右 Joy-Con 连接"
+      },
+      "enabled": {
+        "label": "启用 MCU",
+        "hint": "关闭后，右 Joy-Con 的 IR/NFC 传感器不会工作。"
+      },
+      "status": {
+        "config": "配置模式",
+        "runtime": "当前运行",
+        "session": "数据流"
+      },
+      "threshold": {
+        "label": "灵敏度（白像素计数）",
+        "hint": "数值越低越灵敏，默认 50。"
+      },
+      "mappingHint": "在示意图中为该虚拟键配置映射：",
+      "reset": "恢复默认",
+      "done": "完成",
+      "live": {
+        "title": "实时 IR 数据",
+        "sessionActive": "采集中",
+        "sessionInactive": "等待右 Joy-Con",
+        "proximityOn": "检测到接近",
+        "proximityOff": "未检测到接近",
+        "intensity": "平均亮度",
+        "whitePixels": "白像素计数",
+        "ambient": "环境噪声",
+        "threshold": "触发阈值",
+        "barLabel": "白像素 / 阈值",
+        "history": "白像素历史（约 10 Hz）",
+        "hint": "在 Home 键下方 IR 传感器附近挥手测试。切换 IR 后需重连手柄。"
+      },
+      "nfcLive": {
+        "title": "实时 NFC 数据",
+        "sensingZone": "感应区（当前）",
+        "tagOn": "检测到标签",
+        "tagOff": "等待贴卡",
+        "readyToScan": "可以贴新卡",
+        "scanning": "正在读卡…",
+        "resetting": "感应区已清空，等待就绪…",
+        "waitingSession": "等待 NFC 会话就绪…",
+        "currentUid": "当前 UID",
+        "uid": "UID（十六进制）",
+        "uidLen": "UID 长度",
+        "tagType": "标签类型",
+        "state": "状态码",
+        "statePolling": "轮询中",
+        "stateScanning": "读卡中",
+        "stateTagPresent": "标签在位",
+        "stateIdle": "空闲",
+        "stateUnknown": "未知 ({{code}})",
+        "copy": "复制 UID",
+        "copied": "已复制",
+        "lastUpdate": "最近更新",
+        "senseHistory": "历史感应",
+        "uidHistory": "最近读到的 UID",
+        "rescan": "重新扫描",
+        "hint": "将 NFC 卡贴在右 Joy-Con 的 R 摇杆上。移卡后上方感应区会清空，下方历史记录保留。看到「可以贴新卡」且状态为「轮询中」时再贴下一张；若长时间未就绪可点「重新扫描」。"
+      },
+      "nfcMappingHint": "在示意图中为该虚拟键配置映射："
     }
   }
 }

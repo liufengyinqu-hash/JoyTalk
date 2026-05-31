@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Coffee } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
@@ -14,6 +15,7 @@ const ALIPAY_QR_SRC = "/donate/alipay-qr.png";
 export const AboutSettings: React.FC = () => {
   const { t } = useTranslation();
   const [version, setVersion] = useState("");
+  const [showDonateModal, setShowDonateModal] = useState(false);
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -46,18 +48,16 @@ export const AboutSettings: React.FC = () => {
           title={t("settings.about.supportDevelopment.title")}
           description={t("settings.about.supportDevelopment.description")}
           grouped={true}
-          layout="stacked"
         >
-          <div className="flex flex-col items-start gap-2">
-            <img
-              src={ALIPAY_QR_SRC}
-              alt={t("settings.about.supportDevelopment.alipayAlt")}
-              className="max-w-[180px] w-full h-auto rounded-xl border border-border bg-surface object-contain"
-            />
-            <p className="text-sm text-text-secondary">
-              {t("settings.about.supportDevelopment.alipayCaption")}
-            </p>
-          </div>
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => setShowDonateModal(true)}
+            className="inline-flex items-center gap-2"
+          >
+            <Coffee className="h-4 w-4 text-amber-600" aria-hidden="true" />
+            {t("settings.about.supportDevelopment.button")}
+          </Button>
         </SettingContainer>
 
         <SettingContainer
@@ -77,6 +77,40 @@ export const AboutSettings: React.FC = () => {
         <AppDataDirectory descriptionMode="tooltip" grouped={true} />
         <LogDirectory grouped={true} />
       </SettingsGroup>
+
+      {showDonateModal && (
+        <div
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+          onClick={() => setShowDonateModal(false)}
+        >
+          <div
+            className="surface-card max-w-sm w-full mx-4 p-5 flex flex-col items-center gap-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-full flex items-center justify-between">
+              <h3 className="text-base font-semibold inline-flex items-center gap-2">
+                <Coffee className="h-5 w-5 text-amber-600" aria-hidden="true" />
+                {t("settings.about.supportDevelopment.title")}
+              </h3>
+              <button
+                type="button"
+                className="text-xs text-text-secondary hover:text-text"
+                onClick={() => setShowDonateModal(false)}
+              >
+                {t("common.close")}
+              </button>
+            </div>
+            <img
+              src={ALIPAY_QR_SRC}
+              alt={t("settings.about.supportDevelopment.alipayAlt")}
+              className="w-full max-w-[240px] h-auto rounded-xl border border-border bg-surface object-contain"
+            />
+            <p className="text-sm text-text-secondary text-center">
+              {t("settings.about.supportDevelopment.alipayCaption")}
+            </p>
+          </div>
+        </div>
+      )}
 
       <SettingsGroup title={t("settings.about.acknowledgments.title")}>
         <SettingContainer
