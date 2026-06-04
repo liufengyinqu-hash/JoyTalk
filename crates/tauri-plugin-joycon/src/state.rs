@@ -68,56 +68,45 @@ impl State {
     }
 
     pub fn register_controller(&self, kind: ControllerKind, serial: String) {
-        if let Ok(mut list) = self.connected_controllers.lock() {
-            list.retain(|c| c.serial != serial);
-            list.push(ConnectedController { kind, serial });
-        }
+        let mut list = self.connected_controllers.lock().unwrap_or_else(|e| e.into_inner());
+        list.retain(|c| c.serial != serial);
+        list.push(ConnectedController { kind, serial });
     }
 
     pub fn unregister_controller(&self, serial: &str) {
-        if let Ok(mut list) = self.connected_controllers.lock() {
-            list.retain(|c| c.serial != serial);
-        }
+        let mut list = self.connected_controllers.lock().unwrap_or_else(|e| e.into_inner());
+        list.retain(|c| c.serial != serial);
     }
 
     pub fn clear_controllers(&self) {
-        if let Ok(mut list) = self.connected_controllers.lock() {
-            list.clear();
-        }
-        if let Ok(mut s) = self.ir_sample.lock() {
-            *s = IrLiveSample::default();
-        }
-        if let Ok(mut s) = self.nfc_sample.lock() {
-            *s = NfcLiveSample::default();
-        }
+        self.connected_controllers
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .clear();
+        *self.ir_sample.lock().unwrap_or_else(|e| e.into_inner()) = IrLiveSample::default();
+        *self.nfc_sample.lock().unwrap_or_else(|e| e.into_inner()) = NfcLiveSample::default();
         self.set_mcu_runtime(McuRuntime::default());
     }
 
     pub fn mcu_runtime_snapshot(&self) -> McuRuntime {
-        self.mcu_runtime.lock().map(|g| *g).unwrap_or_default()
+        *self.mcu_runtime.lock().unwrap_or_else(|e| e.into_inner())
     }
 
     pub fn mcu_status_snapshot(&self) -> McuStatus {
-        let config = self.mcu.lock().map(|g| g.clone()).unwrap_or_default();
+        let config = self.mcu.lock().unwrap_or_else(|e| e.into_inner()).clone();
         McuStatus::from_parts(config, self.mcu_runtime_snapshot())
     }
 
     pub fn set_mcu_runtime(&self, runtime: McuRuntime) {
-        if let Ok(mut r) = self.mcu_runtime.lock() {
-            *r = runtime;
-        }
+        *self.mcu_runtime.lock().unwrap_or_else(|e| e.into_inner()) = runtime;
     }
 
     pub fn set_ir_sample(&self, sample: IrLiveSample) {
-        if let Ok(mut s) = self.ir_sample.lock() {
-            *s = sample;
-        }
+        *self.ir_sample.lock().unwrap_or_else(|e| e.into_inner()) = sample;
     }
 
     pub fn set_nfc_sample(&self, sample: NfcLiveSample) {
-        if let Ok(mut s) = self.nfc_sample.lock() {
-            *s = sample;
-        }
+        *self.nfc_sample.lock().unwrap_or_else(|e| e.into_inner()) = sample;
     }
 
     pub fn snapshot(&self) -> JoyConStatus {
@@ -125,8 +114,8 @@ impl State {
         let connected_controllers = self
             .connected_controllers
             .lock()
-            .map(|g| g.clone())
-            .unwrap_or_default();
+            .unwrap_or_else(|e| e.into_inner())
+            .clone();
         JoyConStatus {
             connected: self.connected.load(Relaxed),
             battery: self.battery_pct.load(Relaxed),
@@ -140,15 +129,14 @@ impl State {
     pub fn active_mappings(&self) -> Vec<ButtonMapping> {
         use std::sync::atomic::Ordering::Relaxed;
         if self.per_app_enabled.load(Relaxed) {
-            if let (Ok(front), Ok(profiles)) = (self.frontmost_bundle.lock(), self.profiles.lock())
-            {
-                if let Some(b) = front.as_deref() {
-                    if let Some(p) = profiles.iter().find(|p| p.bundle_id == b) {
-                        return p.mappings.clone();
-                    }
+            let front = self.frontmost_bundle.lock().unwrap_or_else(|e| e.into_inner());
+            let profiles = self.profiles.lock().unwrap_or_else(|e| e.into_inner());
+            if let Some(b) = front.as_deref() {
+                if let Some(p) = profiles.iter().find(|p| p.bundle_id == b) {
+                    return p.mappings.clone();
                 }
             }
         }
-        self.mappings.lock().map(|g| g.clone()).unwrap_or_default()
+        self.mappings.lock().unwrap_or_else(|e| e.into_inner()).clone()
     }
 }

@@ -243,7 +243,10 @@ fn initialize_core_logic(app_handle: &AppHandle) {
                 app.exit(0);
             }
             id if id.starts_with("model_select:") => {
-                let model_id = id.strip_prefix("model_select:").unwrap().to_string();
+                let Some(model_id) = id.strip_prefix("model_select:") else {
+                    return;
+                };
+                let model_id = model_id.to_string();
                 let current_model = settings::get_settings(app).selected_model;
                 if model_id == current_model {
                     return;

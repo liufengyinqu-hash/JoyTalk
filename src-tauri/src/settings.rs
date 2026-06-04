@@ -932,9 +932,16 @@ pub fn get_bindings(app: &AppHandle) -> HashMap<String, ShortcutBinding> {
 pub fn get_stored_binding(app: &AppHandle, id: &str) -> ShortcutBinding {
     let bindings = get_bindings(app);
 
-    let binding = bindings.get(id).unwrap().clone();
-
-    binding
+    bindings.get(id).cloned().unwrap_or_else(|| {
+        log::warn!("Binding '{}' not found, returning empty fallback", id);
+        ShortcutBinding {
+            id: id.to_string(),
+            name: id.to_string(),
+            description: String::new(),
+            default_binding: String::new(),
+            current_binding: String::new(),
+        }
+    })
 }
 
 pub fn get_history_limit(app: &AppHandle) -> usize {

@@ -71,6 +71,12 @@ pub fn open_app(bundle_id: &str) {
     }
 }
 
+/// Execute a user-defined shell command.
+///
+/// **Security note**: This runs arbitrary commands via `sh -c`. The mapping
+/// configuration is user-controlled via the settings UI and stored locally,
+/// so the command source is the user themselves. Never load mappings from
+/// untrusted sources (shared config files, remote presets, etc.).
 pub fn run_shell(command: &str) {
     if command.trim().is_empty() {
         return;
@@ -83,7 +89,7 @@ pub fn run_shell(command: &str) {
         .args(["-c", command])
         .spawn()
     {
-        Ok(_) => info!("[joycon] shell: {command}"),
+        Ok(_) => info!("[joycon] shell command executed"),
         Err(e) => warn!("[joycon] shell failed: {e}"),
     }
 }
@@ -102,7 +108,7 @@ pub fn run_applescript(script: &str) {
             .args(["-e", script])
             .spawn()
         {
-            Ok(_) => info!("[joycon] applescript fired"),
+            Ok(_) => info!("[joycon] applescript executed"),
             Err(e) => warn!("[joycon] applescript failed: {e}"),
         }
     }

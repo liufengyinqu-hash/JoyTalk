@@ -321,15 +321,15 @@ fn device_loop<R: Runtime>(
 }
 
 fn detect_side(dev: &Arc<Mutex<JoyConDevice>>) -> JoyConSide {
-    if let Ok(d) = dev.lock() {
-        match d.device_type() {
-            JoyConDeviceType::JoyConL => JoyConSide::Left,
-            JoyConDeviceType::JoyConR => JoyConSide::Right,
-            JoyConDeviceType::ProCon => JoyConSide::Pro,
-        }
-    } else {
-        JoyConSide::Left
-    }
+    let d = dev.lock().unwrap_or_else(|e| e.into_inner());
+    let dt = d.device_type();
+    let side = match dt {
+        JoyConDeviceType::JoyConL => JoyConSide::Left,
+        JoyConDeviceType::JoyConR => JoyConSide::Right,
+        JoyConDeviceType::ProCon => JoyConSide::Pro,
+    };
+    info!("[joycon] detected side: {side:?} (device_type={dt:?}, serial={})", d.serial_number());
+    side
 }
 
 fn serial_and_first_pair<R: Runtime>(
@@ -343,7 +343,8 @@ fn serial_and_first_pair<R: Runtime>(
         .map(|d| d.serial_number().to_string())
         .unwrap_or_else(|| "unknown".to_string());
     let mut first = false;
-    if let Ok(mut seen) = state.seen_serials.lock() {
+    let mut seen = state.seen_serials.lock().unwrap_or_else(|e| e.into_inner());
+    {
         if !seen.contains(&serial) {
             seen.insert(serial.clone());
             first = true;
@@ -351,11 +352,11 @@ fn serial_and_first_pair<R: Runtime>(
             let cfg = crate::settings::PluginConfig {
                 config_version: crate::settings::current_config_version(),
                 enabled: state.enabled.load(Ordering::Relaxed),
-                mappings: state.mappings.lock().map(|g| g.clone()).unwrap_or_default(),
+                mappings: state.mappings.lock().unwrap_or_else(|e| e.into_inner()).clone(),
                 seen_serials: seen.clone(),
-                imu: state.imu.lock().map(|g| g.clone()).unwrap_or_default(),
-                mcu: state.mcu.lock().map(|g| g.clone()).unwrap_or_default(),
-                profiles: state.profiles.lock().map(|g| g.clone()).unwrap_or_default(),
+                imu: state.imu.lock().unwrap_or_else(|e| e.into_inner()).clone(),
+                mcu: state.mcu.lock().unwrap_or_else(|e| e.into_inner()).clone(),
+                profiles: state.profiles.lock().unwrap_or_else(|e| e.into_inner()).clone(),
                 per_app_enabled: state.per_app_enabled.load(Ordering::Relaxed),
             };
             let _ = save(app, &cfg);
@@ -705,9 +706,7 @@ fn drive<R: Runtime>(
                     non_standard_reports = non_standard_reports.saturating_add(1);
                     reassert_standard_mode(&mut mode_full, non_standard_reports, false);
                 }
-                if let Ok(mut g) = state.last_seen.lock() {
-                    *g = Instant::now();
-                }
+                *state.last_seen.lock().unwrap_or_else(|e| e.into_inner()) = Instant::now();
             }
             Err(e) if is_transient_setup_error(&e) => {}
             Err(e) => return Err(e),
@@ -833,9 +832,7 @@ fn drive<R: Runtime>(
             last_nfc_poll = now;
         }
 
-        if let Ok(mut g) = state.last_seen.lock() {
-            *g = Instant::now();
-        }
+        *state.last_seen.lock().unwrap_or_else(|e| e.into_inner()) = Instant::now();
         non_standard_reports = 0;
 
         mark_connected_if_standard(app, state, &frame_reports[0].0, kind, serial);
@@ -998,9 +995,7 @@ fn drive<R: Runtime>(
 
         if matches!(side, JoyConSide::Right) {
             if let Some(ref mut job) = mcu_switch {
-                if let Ok(mut g) = state.last_seen.lock() {
-                    *g = Instant::now();
-                }
+                *state.last_seen.lock().unwrap_or_else(|e| e.into_inner()) = Instant::now();
                 let desired_on_fail = job.desired;
                 match advance_mcu_switch(
                     app,
@@ -1044,9 +1039,7 @@ fn drive<R: Runtime>(
                             "[joycon] MCU hot-switch {running_mcu:?} -> {desired_mcu:?} ({serial})"
                         );
                     }
-                    if let Ok(mut g) = state.last_seen.lock() {
-                        *g = Instant::now();
-                    }
+                    *state.last_seen.lock().unwrap_or_else(|e| e.into_inner()) = Instant::now();
                     mcu_switch = begin_mcu_switch(
                         app,
                         state,
@@ -1401,9 +1394,7 @@ fn calibrate_sticks<R: Runtime>(
                     right_v.push(r.vertical as i32);
                 }
                 mark_connected_if_standard(app, state, &report, kind, serial);
-                if let Ok(mut g) = state.last_seen.lock() {
-                    *g = Instant::now();
-                }
+                *state.last_seen.lock().unwrap_or_else(|e| e.into_inner()) = Instant::now();
             }
             Err(e) if is_transient_setup_error(&e) => {}
             Err(e) => return Err(e),
@@ -1548,7 +1539,7 @@ fn detect_gestures(
     gesture_until: &mut HashMap<JoyConButton, Instant>,
     last_gesture_at: &mut HashMap<JoyConButton, Instant>,
 ) {
-    let imu = state.imu.lock().map(|g| g.clone()).unwrap_or_default();
+    let imu = state.imu.lock().unwrap_or_else(|e| e.into_inner()).clone();
     let axis = &report.extra.data[0];
     let accel_mag2 =
         (axis.accel_x as i32).pow(2) + (axis.accel_y as i32).pow(2) + (axis.accel_z as i32).pow(2);
@@ -1623,9 +1614,7 @@ pub fn spawn_frontmost_watcher<R: Runtime>(app: AppHandle<R>, state: State) {
         while state.running.load(Ordering::Relaxed) {
             let bundle = read_frontmost_bundle();
             if bundle != last {
-                if let Ok(mut g) = state.frontmost_bundle.lock() {
-                    *g = bundle.clone();
-                }
+                *state.frontmost_bundle.lock().unwrap_or_else(|e| e.into_inner()) = bundle.clone();
                 let _ = app.emit("joycon://frontmost_changed", bundle.clone());
                 last = bundle;
             }
