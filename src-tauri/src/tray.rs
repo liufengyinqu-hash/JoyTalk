@@ -5,9 +5,11 @@ use crate::settings;
 use crate::tray_i18n::get_tray_translations;
 use log::{error, info, warn};
 use std::sync::Arc;
+use std::sync::atomic::Ordering;
 use tauri::image::Image;
 use tauri::menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::tray::TrayIcon;
+use tauri_plugin_joycon::JoyConState;
 use tauri::{AppHandle, Manager, Theme};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
@@ -109,6 +111,23 @@ pub fn update_tray_menu(app: &AppHandle, state: &TrayIconState, locale: Option<&
     let version_label = version_label();
     let version_i = MenuItem::with_id(app, "version", &version_label, false, None::<&str>)
         .expect("failed to create version item");
+
+    // Joy-Con battery status
+    let joycon_label = if let Some(jc_state) = app.try_state::<JoyConState>() {
+        if jc_state.connected.load(Ordering::Relaxed) {
+            let pct = jc_state.battery_pct.load(Ordering::Relaxed);
+            let charging = jc_state.charging.load(Ordering::Relaxed);
+            let icon = if charging { "⚡" } else if pct <= 20 { "🪫" } else { "🔋" };
+            format!("🎮 Joy-Con: {pct}% {icon}")
+        } else {
+            "🎮 Joy-Con: 离线".to_string()
+        }
+    } else {
+        "🎮 Joy-Con: —".to_string()
+    };
+    let joycon_i = MenuItem::with_id(app, "joycon_battery", &joycon_label, false, None::<&str>)
+        .expect("failed to create joycon battery item");
+
     let settings_i = MenuItem::with_id(
         app,
         "settings",
@@ -185,6 +204,7 @@ pub fn update_tray_menu(app: &AppHandle, state: &TrayIconState, locale: Option<&
                 app,
                 &[
                     &version_i,
+                    &joycon_i,
                     &separator(),
                     &cancel_i,
                     &separator(),
@@ -202,6 +222,7 @@ pub fn update_tray_menu(app: &AppHandle, state: &TrayIconState, locale: Option<&
             app,
             &[
                 &version_i,
+                &joycon_i,
                 &separator(),
                 &copy_last_transcript_i,
                 &separator(),

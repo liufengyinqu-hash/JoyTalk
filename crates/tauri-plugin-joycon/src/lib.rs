@@ -10,6 +10,7 @@ mod state;
 mod types;
 
 pub use actions::{ActionContext, ActionRegistry};
+pub use state::State as JoyConState;
 pub use types::{
     default_mappings, ActionPayload, AppProfile, ButtonMapping, ControllerDetected, ControllerKind,
     ImuConfig, IrLiveSample, JoyConActionFired, JoyConButton, JoyConButtonEvent, JoyConSide,

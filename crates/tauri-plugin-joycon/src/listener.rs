@@ -686,12 +686,16 @@ fn drive<R: Runtime>(
     let mut mode_full = StandardFullMode::new(driver)?;
     info!("[joycon] device {device_idx} ({side:?}) opened");
 
+    // Enable vibration for rumble feedback
+    let _ = mode_full.driver_mut().enable_feature(joycon_features::JoyConFeature::Vibration);
+
     let mut prev_state: HashMap<JoyConButton, bool> = HashMap::new();
     let mut fsm: HashMap<JoyConButton, PressFsm> = HashMap::new();
     let mut gesture_until: HashMap<JoyConButton, Instant> = HashMap::new();
     let mut last_gesture_at: HashMap<JoyConButton, Instant> = HashMap::new();
     let mut last_status_emit = Instant::now() - BATTERY_EMIT_INTERVAL;
     let mut non_standard_reports: u32 = 0;
+    let mut current_led_pattern: u8 = 0;
 
     // Settle window after a (re)open. Drain IMU/button reports without
     // dispatching gestures, but still mark connected once 0x30 reports flow.
@@ -746,6 +750,11 @@ fn drive<R: Runtime>(
     let mut last_nfc_diag = Instant::now() - NFC_DIAG_INTERVAL;
     let mut last_nfc_poll = Instant::now() - NFC_POLL_IDLE;
     let mut last_input_activity = Instant::now() - NFC_INPUT_QUIET;
+    let mut rumble_until: Option<Instant> = None;
+
+    // Set initial LED pattern (idle = LED0 solid)
+    apply_led_pattern(mode_full.driver_mut(), 1);
+    current_led_pattern = 1;
 
     while state.running.load(Ordering::Relaxed) {
         let desired_mcu = desired_mcu_mode(state, side);
@@ -990,6 +999,25 @@ fn drive<R: Runtime>(
                     .store(frame_report.common.battery.is_charging, Ordering::Relaxed);
                 emit_status(app, state);
                 last_status_emit = Instant::now();
+
+                // Update LED pattern based on state
+                let desired_led = state.led_pattern.load(Ordering::Relaxed);
+                if desired_led != current_led_pattern {
+                    apply_led_pattern(mode_full.driver_mut(), desired_led);
+                    current_led_pattern = desired_led;
+                }
+            }
+        }
+
+        // Process rumble requests
+        if state.rumble_pending.swap(false, Ordering::Relaxed) {
+            rumble_pulse(mode_full.driver_mut());
+            rumble_until = Some(Instant::now() + Duration::from_millis(80));
+        }
+        if let Some(end) = rumble_until {
+            if Instant::now() >= end {
+                rumble_stop(mode_full.driver_mut());
+                rumble_until = None;
             }
         }
 
@@ -1116,15 +1144,15 @@ fn handle_edge<R: Runtime>(
         match mode {
             TriggerMode::Hold => {
                 if pressed {
-                    fire(app, registry, &payload, btn, mode, true);
+                    fire(app, registry, &payload, btn, mode, true, state);
                 } else {
-                    fire(app, registry, &payload, btn, mode, false);
+                    fire(app, registry, &payload, btn, mode, false, state);
                 }
             }
             TriggerMode::Tap => {
                 if let Some(dur) = release_duration {
                     if dur <= TAP_THRESHOLD {
-                        fire(app, registry, &payload, btn, mode, true);
+                        fire(app, registry, &payload, btn, mode, true, state);
                     }
                 }
             }
@@ -1134,7 +1162,7 @@ fn handle_edge<R: Runtime>(
                         entry.last_release = None;
                     } else if let Some(prev_release) = entry.last_release {
                         if now.duration_since(prev_release) <= DOUBLE_TAP_WINDOW {
-                            fire(app, registry, &payload, btn, mode, true);
+                            fire(app, registry, &payload, btn, mode, true, state);
                             entry.last_release = None;
                         } else {
                             entry.last_release = Some(now);
@@ -1154,7 +1182,7 @@ fn handle_edge<R: Runtime>(
             TriggerMode::Repeat => {
                 if pressed {
                     entry.last_repeat_at = Some(now);
-                    fire(app, registry, &payload, btn, mode, true);
+                    fire(app, registry, &payload, btn, mode, true, state);
                 } else {
                     entry.last_repeat_at = None;
                 }
@@ -1196,7 +1224,7 @@ fn check_long_press<R: Runtime>(
                     continue;
                 }
                 if now.duration_since(start) >= LONG_PRESS_THRESHOLD {
-                    fire(app, registry, &payload, btn, mode, true);
+                    fire(app, registry, &payload, btn, mode, true, state);
                     entry.long_fired = true;
                 }
             }
@@ -1208,7 +1236,7 @@ fn check_long_press<R: Runtime>(
                 }
                 let last = entry.last_repeat_at.unwrap_or(start);
                 if now.duration_since(last) >= REPEAT_INTERVAL {
-                    fire(app, registry, &payload, btn, mode, true);
+                    fire(app, registry, &payload, btn, mode, true, state);
                     entry.last_repeat_at = Some(now);
                 }
             }
@@ -1236,8 +1264,13 @@ fn fire<R: Runtime>(
     button: JoyConButton,
     mode: TriggerMode,
     pressed: bool,
+    state: &State,
 ) {
     dispatch(app, registry, payload, button, mode, pressed);
+    // Request rumble if enabled
+    if pressed && state.rumble_enabled.load(Ordering::Relaxed) {
+        state.rumble_pending.store(true, Ordering::Relaxed);
+    }
     let action_name = match payload {
         ActionPayload::Builtin { id } => id.clone(),
         ActionPayload::Keyboard { .. } => "<macro>".to_string(),
@@ -1605,6 +1638,34 @@ fn gesture_active(
 fn emit_status<R: Runtime>(app: &AppHandle<R>, state: &State) {
     let s: JoyConStatus = state.snapshot();
     let _ = app.emit("joycon://status", s);
+}
+
+/// Apply LED pattern to Joy-Con player lights.
+/// 0=off, 1=idle(LED0 solid), 2=recording(all flash), 3=low battery(LED0 flash)
+fn apply_led_pattern(driver: &mut SimpleJoyConDriver, pattern: u8) {
+    use joycon_rs::prelude::lights::*;
+    let result = match pattern {
+        0 => driver.set_player_lights(&[], &[]),
+        1 => driver.set_player_lights(&[LightUp::LED0], &[]),
+        2 => driver.set_player_lights(&[], &[Flash::LED0, Flash::LED1, Flash::LED2, Flash::LED3]),
+        3 => driver.set_player_lights(&[], &[Flash::LED0]),
+        _ => driver.set_player_lights(&[LightUp::LED0], &[]),
+    };
+    if let Err(e) = result {
+        warn!("[joycon] LED set failed: {e:?}");
+    }
+}
+
+/// Send a short rumble pulse.
+fn rumble_pulse(driver: &mut SimpleJoyConDriver) {
+    let rumble = Rumble::new(200.0, 0.6);
+    let _ = driver.rumble((Some(rumble), Some(rumble)));
+}
+
+/// Stop rumble (send zero amplitude).
+fn rumble_stop(driver: &mut SimpleJoyConDriver) {
+    let silent = Rumble::new(160.0, 0.0);
+    let _ = driver.rumble((Some(silent), Some(silent)));
 }
 
 #[cfg(target_os = "macos")]

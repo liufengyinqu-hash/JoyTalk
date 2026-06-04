@@ -31,6 +31,12 @@ pub struct State {
     pub per_app_enabled: Arc<AtomicBool>,
     pub frontmost_bundle: Arc<Mutex<Option<String>>>,
     pub connected_controllers: Arc<Mutex<Vec<ConnectedController>>>,
+    /// LED pattern: 0=off, 1=idle(LED0), 2=recording(all flash), 3=low battery(LED0 flash)
+    pub led_pattern: Arc<AtomicU8>,
+    /// Rumble feedback enabled
+    pub rumble_enabled: Arc<AtomicBool>,
+    /// Set by fire() to request a rumble pulse from the drive loop
+    pub rumble_pending: Arc<AtomicBool>,
 }
 
 impl State {
@@ -64,6 +70,9 @@ impl State {
             per_app_enabled: Arc::new(AtomicBool::new(per_app_enabled)),
             frontmost_bundle: Arc::new(Mutex::new(None)),
             connected_controllers: Arc::new(Mutex::new(Vec::new())),
+            led_pattern: Arc::new(AtomicU8::new(1)), // idle = LED0
+            rumble_enabled: Arc::new(AtomicBool::new(true)),
+            rumble_pending: Arc::new(AtomicBool::new(false)),
         }
     }
 
