@@ -6,6 +6,7 @@ pub mod audio_toolkit;
 pub mod cli;
 mod clipboard;
 mod commands;
+mod feishu_client;
 mod helpers;
 mod input;
 mod llm_client;

@@ -603,6 +603,26 @@ impl ShortcutAction for TranscribeAction {
                                 utils::hide_recording_overlay(&ah);
                                 change_tray_icon(&ah, TrayIconState::Idle);
                             } else {
+                                // Feishu integration: append to document if enabled
+                                let feishu_settings = get_settings(&ah).feishu;
+                                if feishu_settings.enabled && !feishu_settings.document_id.is_empty() {
+                                    let feishu_text = if feishu_settings.prepend_timestamp {
+                                        format!("[{}] {}", chrono::Local::now().format("%H:%M:%S"), &processed.final_text)
+                                    } else {
+                                        processed.final_text.clone()
+                                    };
+                                    let feishu = crate::feishu_client::FeishuClient::new(
+                                        feishu_settings.app_id.clone(),
+                                        feishu_settings.app_secret.clone(),
+                                    );
+                                    let doc_id = feishu_settings.document_id.clone();
+                                    tauri::async_runtime::spawn(async move {
+                                        if let Err(e) = feishu.append_text(&doc_id, &feishu_text).await {
+                                            warn!("Feishu append failed: {e}");
+                                        }
+                                    });
+                                }
+
                                 let ah_clone = ah.clone();
                                 let paste_time = Instant::now();
                                 let final_text = processed.final_text;

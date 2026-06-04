@@ -430,6 +430,41 @@ pub struct AppSettings {
     pub whisper_gpu_device: i32,
     #[serde(default)]
     pub extra_recording_buffer_ms: u64,
+    #[serde(default)]
+    pub feishu: FeishuConfig,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Type)]
+pub struct FeishuConfig {
+    #[serde(default)]
+    pub enabled: bool,
+    #[serde(default)]
+    pub app_id: String,
+    #[serde(default)]
+    pub app_secret: String,
+    #[serde(default)]
+    pub document_id: String,
+    #[serde(default = "default_feishu_prepend_timestamp")]
+    pub prepend_timestamp: bool,
+    #[serde(default)]
+    pub folder_token: String,
+}
+
+impl Default for FeishuConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            app_id: String::new(),
+            app_secret: String::new(),
+            document_id: String::new(),
+            prepend_timestamp: true,
+            folder_token: String::new(),
+        }
+    }
+}
+
+fn default_feishu_prepend_timestamp() -> bool {
+    true
 }
 
 fn default_model() -> String {
@@ -814,6 +849,7 @@ pub fn get_default_settings() -> AppSettings {
         ort_accelerator: OrtAcceleratorSetting::default(),
         whisper_gpu_device: default_whisper_gpu_device(),
         extra_recording_buffer_ms: 0,
+        feishu: FeishuConfig::default(),
     }
 }
 
