@@ -1686,41 +1686,59 @@ pub fn spawn_frontmost_watcher<R: Runtime>(app: AppHandle<R>, state: State) {
 
 #[cfg(target_os = "macos")]
 fn read_frontmost_bundle() -> Option<String> {
-    let out = std::process::Command::new("osascript")
-        .args([
-            "-e",
-            "tell application \"System Events\" to get bundle identifier of first process whose frontmost is true",
-        ])
+    let asn = std::process::Command::new("lsappinfo")
+        .arg("front")
         .output()
         .ok()?;
-    if !out.status.success() {
+    let asn_str = String::from_utf8_lossy(&asn.stdout).trim().to_string();
+    if asn_str.is_empty() {
         return None;
     }
-    let s = String::from_utf8_lossy(&out.stdout).trim().to_string();
-    if s.is_empty() {
-        None
-    } else {
-        Some(s)
-    }
+    let out = std::process::Command::new("lsappinfo")
+        .args(["info", "-only", "bundleid", &asn_str])
+        .output()
+        .ok()?;
+    // Output format: "CFBundleIdentifier"="com.example.app"
+    let s = String::from_utf8_lossy(&out.stdout);
+    s.split('"').nth(3).map(|b| b.to_string())
 }
 
 #[cfg(target_os = "macos")]
 pub fn read_frontmost_app() -> Option<(String, String)> {
-    let out = std::process::Command::new("osascript")
-        .args([
-            "-e",
-            "tell application \"System Events\" to set p to first process whose frontmost is true\nset n to name of p\nset b to bundle identifier of p\nreturn n & \"|\" & b",
-        ])
+    let asn = std::process::Command::new("lsappinfo")
+        .arg("front")
         .output()
         .ok()?;
-    if !out.status.success() {
+    let asn_str = String::from_utf8_lossy(&asn.stdout).trim().to_string();
+    if asn_str.is_empty() {
         return None;
     }
-    let s = String::from_utf8_lossy(&out.stdout).trim().to_string();
-    let mut parts = s.splitn(2, '|');
-    let name = parts.next()?.to_string();
-    let bundle = parts.next().unwrap_or("").to_string();
-    Some((name, bundle))
+    let out = std::process::Command::new("lsappinfo")
+        .args(["info", "-only", "bundleid", "-only", "name", &asn_str])
+        .output()
+        .ok()?;
+    let text = String::from_utf8_lossy(&out.stdout);
+    let mut bundle = String::new();
+    let mut name = String::new();
+    for line in text.lines() {
+        if line.contains("CFBundleIdentifier") {
+            if let Some(v) = line.split('"').nth(3) {
+                bundle = v.to_string();
+            }
+        } else if line.contains("LSDisplayName") {
+            if let Some(v) = line.split('"').nth(3) {
+                name = v.to_string();
+            }
+        }
+    }
+    if bundle.is_empty() {
+        None
+    } else {
+        if name.is_empty() {
+            name = bundle.clone();
+        }
+        Some((name, bundle))
+    }
 }
 
 #[cfg(not(target_os = "macos"))]
