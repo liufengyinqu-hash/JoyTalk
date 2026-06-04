@@ -58,9 +58,9 @@ JoyTalk 深度集成了 Nintendo Switch Joy-Con 手柄支持：
 
 **macOS（Apple Silicon）：**
 
-从 [GitHub Releases](https://github.com/liufengyinqu-hash/JoyTalk/releases) 下载最新版 DMG 文件（`JoyTalk_1.0.2_aarch64.dmg`），打开后拖入 Applications 文件夹即可。
+从 [GitHub Releases](https://github.com/liufengyinqu-hash/JoyTalk/releases) 下载最新版 DMG 文件（`JoyTalk_1.0.3_aarch64.dmg`），打开后拖入 Applications 文件夹即可。
 
-本地构建的 DMG 文件位于：`target/release/bundle/dmg/JoyTalk_1.0.2_aarch64.dmg`
+本地构建的 DMG 文件位于：`target/release/bundle/dmg/JoyTalk_1.0.3_aarch64.dmg`
 
 **从源码构建：** 参见 [BUILD.md](BUILD.md)
 
