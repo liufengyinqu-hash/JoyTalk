@@ -72,8 +72,10 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJBQjcyMDk1MjA2NjAxRjkKUldUNUFXWWdsU0MzdXRRZi8zYzhqV2FaNUVDbDd2Rk5VM1IvWWowVXdmRFNKQ1BrMXF5RFFsLy8K",
-      "endpoints": []
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ1QzIyQTI4Q0U3MUNFRjUKUldUMXpuSE9LQ3JDUmVQKzVvVmNWNGViN3hwN0ZRYlpDT1J0Sy9xSVQ4ek5Tck0ybTlsT21XakEK",
+      "endpoints": [
+        "https://github.com/liufengyinqu-hash/JoyTalk/releases/latest/download/latest.json"
+      ]
     }
   }
 }
