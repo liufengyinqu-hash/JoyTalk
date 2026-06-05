@@ -1,0 +1,6 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-get-ir-sample"
+description = "Allow joycon_get_ir_sample command"
+commands.allow = ["joycon_get_ir_sample"]

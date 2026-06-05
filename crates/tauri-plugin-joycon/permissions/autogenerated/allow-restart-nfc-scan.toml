@@ -1,0 +1,6 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-restart-nfc-scan"
+description = "Allow joycon_restart_nfc_scan command"
+commands.allow = ["joycon_restart_nfc_scan"]

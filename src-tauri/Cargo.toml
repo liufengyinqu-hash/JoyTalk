@@ -1,6 +1,6 @@
 [package]
 name = "joytalk"
-version = "1.0.3"
+version = "1.0.4"
 description = "JoyTalk"
 authors = ["cjpais"]
 edition = "2021"

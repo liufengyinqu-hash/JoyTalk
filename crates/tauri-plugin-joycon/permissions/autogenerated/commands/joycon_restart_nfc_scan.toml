@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-restart-nfc-scan"
+description = "Enables the joycon_restart_nfc_scan command without any pre-configured scope."
+commands.allow = ["joycon_restart_nfc_scan"]
+
+[[permission]]
+identifier = "deny-joycon-restart-nfc-scan"
+description = "Denies the joycon_restart_nfc_scan command without any pre-configured scope."
+commands.deny = ["joycon_restart_nfc_scan"]

@@ -9,6 +9,7 @@ import { ScriptRecorder } from "./joycon/ScriptRecorder";
 import { ImuTuner } from "./joycon/ImuTuner";
 import { IrTuner } from "./joycon/IrTuner";
 import { ProfilesManager } from "./joycon/ProfilesManager";
+import { FeishuSettings } from "./feishu/FeishuSettings";
 
 type View =
   | { kind: "list"; tab: "discover" | "installed" }
@@ -18,7 +19,8 @@ type View =
   | { kind: "script" }
   | { kind: "imu" }
   | { kind: "ir" }
-  | { kind: "profiles" };
+  | { kind: "profiles" }
+  | { kind: "feishu" };
 
 export const PluginsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -54,6 +56,20 @@ export const PluginsPage: React.FC = () => {
 
   if (view.kind === "profiles") {
     return <ProfilesManager onClose={() => setView({ kind: "detail", pluginId: "joycon" })} />;
+  }
+
+  if (view.kind === "detail" && view.pluginId === "feishu") {
+    return (
+      <div className="max-w-4xl w-full mx-auto space-y-3">
+        <button
+          className="text-xs text-text-secondary hover:text-text"
+          onClick={goList}
+        >
+          ← Plugins
+        </button>
+        <FeishuSettings />
+      </div>
+    );
   }
 
   if (view.kind === "detail" && view.pluginId === "joycon") {

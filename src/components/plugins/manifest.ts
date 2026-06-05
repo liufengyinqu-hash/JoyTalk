@@ -27,6 +27,17 @@ export const BUILTIN_PLUGINS: PluginManifest[] = [
     builtin: true,
   },
   {
+    id: "feishu",
+    name: "飞书文档",
+    description: "转录完成后自动追加到飞书文档（会议纪要场景）",
+    version: "0.1.0",
+    author: "JoyTalk",
+    icon: "📄",
+    category: "integration",
+    capabilities: ["document-append"],
+    builtin: true,
+  },
+  {
     id: "dji-mic",
     name: "DJI Mic Auto-select",
     description: "Auto-switch input device when DJI Mic is connected",

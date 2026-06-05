@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>JoyTalk - 小红书</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    padding: 12px;
+  }
+  .card {
+    width: 390px;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+  }
+
+  /* 封面 */
+  .cover {
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(255,71,87,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(0,168,255,0.1) 0%, transparent 60%);
+  }
+  .cover-icon {
+    position: relative;
+    z-index: 1;
+    font-size: 40px;
+    flex-shrink: 0;
+  }
+  .cover-info {
+    position: relative;
+    z-index: 1;
+  }
+  .cover-info h2 { color: #fff; font-size: 22px; font-weight: 800; white-space: nowrap; }
+  .cover-info .sub { color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 2px; white-space: nowrap; }
+
+  /* 硬件卡片 */
+  .hw-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .hw-box {
+    background: #fafbfc;
+    border: 1px solid #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+  }
+  .hw-box img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+  }
+  .hw-box .name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #333;
+    padding: 6px 6px 2px;
+  }
+  .hw-box .note {
+    font-size: 9px;
+    color: #999;
+    padding: 0 6px 6px;
+    line-height: 1.4;
+  }
+
+  /* 正文 */
+  .body { padding: 12px 14px 8px; }
+  .body p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  .body .highlight { color: #ff4757; font-weight: 600; }
+  .body .lead {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #222;
+    margin-bottom: 8px;
+  }
+
+  /* 四个亮点 */
+  .highlights {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .hl-item {
+    background: #fafbfc;
+    border-radius: 10px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .hl-item .icon { font-size: 18px; flex-shrink: 0; }
+  .hl-item .txt { font-size: 11px; font-weight: 600; color: #333; }
+
+  /* 平台提示 */
+  .tip {
+    background: #fffbf0;
+    border: 1px solid #ffe8b0;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 10px;
+    color: #b8860b;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  /* 标签 */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 8px 0 2px;
+  }
+  .tag {
+    font-size: 10px;
+    color: #666;
+    background: #f5f5f5;
+    padding: 3px 7px;
+    border-radius: 10px;
+  }
+  .tag.hot { color: #ff4757; background: #fff0f0; }
+
+  .footer-bar {
+    padding: 8px 14px;
+    border-top: 1px solid #f2f2f2;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #999;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- 封面 -->
+  <div class="cover">
+    <div class="cover-icon">🎮</div>
+    <div class="cover-info">
+      <h2>Joy-Con → Mac 万能遥控器</h2>
+      <p class="sub">🎤 语音控制 · Vibe Coding</p>
+    </div>
+  </div>
+
+  <!-- 正文 -->
+  <div class="body">
+    <div class="hw-row">
+      <div class="hw-box">
+        <img src="./joycon.png" alt="Nintendo Switch Joy-Con">
+        <div class="name">Nintendo Joy-Con</div>
+        <div class="note">蓝牙直连 · 24 键 + 六轴体感</div>
+        <div class="note" style="padding-top:0">IR 人体识别 · NFC</div>
+      </div>
+      <div class="hw-box">
+        <img src="./dji-mic-mini.png" alt="DJI Mic Mini">
+        <div class="name">DJI Mic Mini（可选）</div>
+        <div class="note">10g 无线麦 · 也可用内置麦克风</div>
+      </div>
+    </div>
+
+    <p class="lead">
+      <span class="highlight">🎤 语音控制 × Vibe Coding</span><br>说话就能写代码，效率翻倍
+    </p>
+    <p>
+<span class="highlight">🎮 吃灰 Joy-Con 秒变神器</span> —— 左手按键语音输入，右手摇杆切模式，手柄手感吊打键盘快捷键，已经回不去了 😂
+    </p>
+    <p>
+<span class="highlight">🎤 Vibe Coding 用嘴写码</span> —— 本地 Whisper 离线转文字，对着 Cursor / Windsurf / Claude Code 说话就能写代码，效率翻倍。
+    </p>
+    <p>
+<span class="highlight">⚡ 24 键任意映射</span> —— 一键打开 App、执行脚本、粘贴常用语、组合快捷键，想干嘛按一下就行。
+    </p>
+    <p>
+<span class="highlight">🎙️ 配上 DJI Mic Mini</span>（或电脑自带麦克风）拾音更清晰，开会录音直接出会议纪要。
+    </p>
+    <p>
+<span class="highlight">🆓 完全免费开源</span> —— 需要私聊获取即可。
+    </p>
+
+    <div class="highlights">
+      <div class="hl-item"><span class="icon">🎙️</span><span class="txt">本地 Whisper 离线转文字</span></div>
+      <div class="hl-item"><span class="icon">🎮</span><span class="txt">24 键任意映射快捷操作</span></div>
+      <div class="hl-item"><span class="icon">⌨️</span><span class="txt">键盘宏 / 脚本 / 打开 App</span></div>
+      <div class="hl-item"><span class="icon">🤖</span><span class="txt">Vibe Coding 用嘴写代码</span></div>
+    </div>
+
+    <div class="tip">
+      💻 当前仅支持 <b>macOS</b>，Windows 版本开发中
+    </div>
+
+    <div class="tags">
+      <span class="tag hot"># Joy-Con</span>
+      <span class="tag hot"># Vibe Coding</span>
+      <span class="tag"># 语音控制</span>
+      <span class="tag"># 语音输入</span>
+      <span class="tag"># Mac 必备</span>
+      <span class="tag"># macOS 软件</span>
+      <span class="tag"># 开源</span>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span>JoyTalk</span>
+    <span>❤️ 328 &nbsp; 💬 56 &nbsp; ⭐ 1.2k</span>
+  </div>
+</div>
+
+</body>
+</html>

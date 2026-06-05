@@ -3,6 +3,8 @@ import { Coffee } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 import { SettingsGroup } from "../../ui/SettingsGroup";
 import { SettingContainer } from "../../ui/SettingContainer";
 import { Button } from "../../ui/Button";
@@ -16,6 +18,8 @@ export const AboutSettings: React.FC = () => {
   const { t } = useTranslation();
   const [version, setVersion] = useState("");
   const [showDonateModal, setShowDonateModal] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<"idle" | "available" | "upToDate">("idle");
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -31,6 +35,27 @@ export const AboutSettings: React.FC = () => {
     fetchVersion();
   }, []);
 
+  const handleCheckUpdate = async () => {
+    setIsChecking(true);
+    setUpdateStatus("idle");
+    try {
+      const update = await check();
+      if (update) {
+        setUpdateStatus("available");
+        await update.downloadAndInstall();
+        await relaunch();
+      } else {
+        setUpdateStatus("upToDate");
+        setTimeout(() => setUpdateStatus("idle"), 3000);
+      }
+    } catch (e) {
+      console.error("Update check failed:", e);
+      setUpdateStatus("idle");
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
       <SettingsGroup title={t("settings.about.title")}>
@@ -40,8 +65,24 @@ export const AboutSettings: React.FC = () => {
           description={t("settings.about.version.description")}
           grouped={true}
         >
-          {/* eslint-disable-next-line i18next/no-literal-string */}
-          <span className="text-sm font-mono">v{version}</span>
+          <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line i18next/no-literal-string */}
+            <span className="text-sm font-mono">v{version}</span>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleCheckUpdate}
+              disabled={isChecking}
+            >
+              {isChecking
+                ? "检查中..."
+                : updateStatus === "upToDate"
+                  ? "已是最新 ✓"
+                  : updateStatus === "available"
+                    ? "更新中..."
+                    : "检查更新"}
+            </Button>
+          </div>
         </SettingContainer>
 
         <SettingContainer

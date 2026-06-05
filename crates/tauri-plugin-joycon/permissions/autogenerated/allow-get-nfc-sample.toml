@@ -1,0 +1,6 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-get-nfc-sample"
+description = "Allow joycon_get_nfc_sample command"
+commands.allow = ["joycon_get_nfc_sample"]

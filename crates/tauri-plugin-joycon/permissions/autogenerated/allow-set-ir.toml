@@ -1,0 +1,6 @@
+"$schema" = "../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-set-ir"
+description = "Allow joycon_set_ir command"
+commands.allow = ["joycon_set_ir"]

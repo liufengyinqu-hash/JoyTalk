@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-get-ir-sample"
+description = "Enables the joycon_get_ir_sample command without any pre-configured scope."
+commands.allow = ["joycon_get_ir_sample"]
+
+[[permission]]
+identifier = "deny-joycon-get-ir-sample"
+description = "Denies the joycon_get_ir_sample command without any pre-configured scope."
+commands.deny = ["joycon_get_ir_sample"]

@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-joycon-get-nfc-sample"
+description = "Enables the joycon_get_nfc_sample command without any pre-configured scope."
+commands.allow = ["joycon_get_nfc_sample"]
+
+[[permission]]
+identifier = "deny-joycon-get-nfc-sample"
+description = "Denies the joycon_get_nfc_sample command without any pre-configured scope."
+commands.deny = ["joycon_get_nfc_sample"]
