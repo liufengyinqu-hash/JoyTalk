@@ -41,8 +41,8 @@ const BATTERY_EMIT_INTERVAL: Duration = Duration::from_secs(10);
 const IR_EMIT_INTERVAL: Duration = Duration::from_millis(100);
 const NFC_EMIT_INTERVAL: Duration = Duration::from_millis(100);
 const NFC_DIAG_INTERVAL: Duration = Duration::from_secs(2);
-const MCU_ENABLE_DEFER: Duration = Duration::from_millis(500);
-const MCU_ENABLE_SLICE: Duration = Duration::from_millis(20);
+const MCU_ENABLE_DEFER: Duration = Duration::from_millis(150);
+const MCU_ENABLE_SLICE: Duration = Duration::from_millis(150);
 
 enum PendingMcuEnable {
     Ir(IrSession),
